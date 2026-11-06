@@ -26,6 +26,21 @@
   --rp-attention: var(--rp-warn);
   --rp-quiet-border: var(--rp-stroke-soft);
 }
+/* Reusable contextual help for every interactive control. Rendered in the browser top layer. */
+#rp-interface-tooltip {
+  position: fixed !important; inset: auto !important; margin: 0 !important;
+  max-width: min(360px, calc(100vw - 20px)); width: max-content;
+  padding: 10px 12px; border: 1px solid var(--rp-stroke) !important;
+  border-radius: 7px; background: var(--rp-surface-alt) !important;
+  color: var(--rp-fg) !important; font: inherit; font-size: 15px !important;
+  line-height: 1.45; letter-spacing: 0; font-style: normal;
+  box-shadow: none !important; pointer-events: none; z-index: 2147483647;
+  white-space: normal; overflow-wrap: anywhere;
+}
+#rp-interface-tooltip[hidden] { display: none !important; }
+#rp-interface-tooltip:not(:popover-open) { display: none; }
+#rp-interface-tooltip:popover-open { display: block; }
+
 /* The historical light-mode setting does not substitute a hard-coded palette. */
 body[data-rp-light] { --rp-surface-alt: color-mix(in srgb, var(--SmartThemeBlurTintColor) 92%, var(--SmartThemeBodyColor) 8%); }
 
@@ -112,6 +127,24 @@ body[data-rp-light] { --rp-surface-alt: color-mix(in srgb, var(--SmartThemeBlurT
   border-color: var(--rp-highlight) !important;
   background: var(--rp-highlight-wash) !important; font-weight: 700;
 }
+/* Brief start-here guide: collapsed by default, expanded when requested. */
+.reproductive-system-settings .rp-onboarding {
+  margin: 0 0 8px; border-bottom: 1px solid var(--rp-stroke-soft);
+  background: transparent !important;
+}
+.reproductive-system-settings .rp-onboarding > summary {
+  min-height: 36px; padding: 7px 3px; cursor: pointer;
+  color: var(--rp-fg); font-weight: 650; list-style: none;
+}
+.reproductive-system-settings .rp-onboarding > summary::-webkit-details-marker { display: none; }
+.reproductive-system-settings .rp-onboarding > summary i { color: var(--rp-highlight); margin-right: 7px; }
+.reproductive-system-settings .rp-onboarding :is(ol,p) {
+  font-size: .88em; line-height: 1.5; color: var(--rp-muted);
+  margin: 3px 0 9px; padding-right: 3px;
+}
+.reproductive-system-settings .rp-onboarding ol { padding-left: 23px; }
+.reproductive-system-settings .rp-onboarding li { margin: 4px 0; }
+
 .reproductive-system-settings .rp-dashboard-shell { padding: 0; display: block; min-width: 0; }
 .reproductive-system-settings .rp-main-grid { display: block; min-width: 0; }
 .reproductive-system-settings .rp-card {
@@ -133,6 +166,7 @@ body[data-rp-light] { --rp-surface-alt: color-mix(in srgb, var(--SmartThemeBlurT
 }
 .reproductive-system-settings .rp-mini-options { border-top: 1px solid var(--rp-stroke-soft); margin-top: 4px; padding-top: 3px; }
 #extensions_settings2 .reproductive-system-settings label.checkbox_label {
+  position: relative;
   display: flex !important; flex-direction: row-reverse !important;
   align-items: center !important; justify-content: space-between !important;
   width: 100%; min-height: 39px !important; margin: 0 !important;
@@ -142,7 +176,15 @@ body[data-rp-light] { --rp-surface-alt: color-mix(in srgb, var(--SmartThemeBlurT
 }
 .reproductive-system-settings label.checkbox_label + label.checkbox_label,
 .reproductive-system-settings :is(.rp-field-card,.rp-form-card) + :is(.rp-field-card,.rp-form-card) { border-top: 1px solid var(--rp-stroke-soft) !important; }
-.reproductive-system-settings label.checkbox_label span { flex: 1; min-width: 0; text-align: left; }
+.reproductive-system-settings label.checkbox_label span { flex: 1; min-width: 0; text-align: left; padding-right: 42px; }
+#extensions_settings2 .reproductive-system-settings label.checkbox_label::after {
+  content: 'Выкл.'; position: absolute; right: 48px; top: 50%;
+  transform: translateY(-50%); color: var(--rp-muted);
+  font-size: .73em; font-weight: 600; pointer-events: none;
+}
+#extensions_settings2 .reproductive-system-settings label.checkbox_label:has(input[type="checkbox"]:checked)::after {
+  content: 'Вкл.'; color: var(--rp-fg);
+}
 /* Render the switch, not the custom Tavern tick glyph. Control remains inside full-width label. */
 #extensions_settings2 .reproductive-system-settings label.checkbox_label input[type="checkbox"] {
   -webkit-appearance: none !important; appearance: none !important;
@@ -268,6 +310,33 @@ body[data-rp-light] { --rp-surface-alt: color-mix(in srgb, var(--SmartThemeBlurT
 .reproductive-system-settings .rp-m-action-row { display: flex; gap: 8px; padding: 6px 11px; }
 .reproductive-system-settings .rp-m-action-row > button { flex: 1; margin: 0; }
 
+/* Clear, low-profile event actions and advanced disclosures. */
+.reproductive-system-settings .rp-event-choices {
+  display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 7px;
+  margin-top: 7px;
+}
+#extensions_settings2 .reproductive-system-settings .rp-event-actions > button,
+#extensions_settings2 .reproductive-system-settings .rp-event-choice {
+  display: flex; align-items: center; justify-content: center;
+  gap: 7px; width: 100%; white-space: normal; text-align: center;
+}
+.reproductive-system-settings :is(.rp-event-choices,.rp-event-actions) i { color: var(--rp-highlight); }
+.reproductive-system-settings .rp-advanced-options {
+  margin-top: 10px; border-top: 1px solid var(--rp-stroke-soft);
+}
+.reproductive-system-settings .rp-advanced-options > summary {
+  min-height: 38px; padding: 9px 2px; cursor: pointer; list-style: none;
+  color: var(--rp-muted); font-weight: 650;
+}
+.reproductive-system-settings .rp-advanced-options > summary::-webkit-details-marker { display: none; }
+.reproductive-system-settings .rp-advanced-options > summary i { margin-right: 7px; }
+.reproductive-system-settings .rp-advanced-options > .rp-utility-actions { margin-top: 5px; }
+.reproductive-system-settings .rp-manual-pregnancy,
+.reproductive-system-settings .rp-manual-child { display: grid; gap: 7px; }
+.reproductive-system-settings #repro-manual-panel[data-rp-manual-view="pregnancy"] .rp-manual-child,
+.reproductive-system-settings #repro-manual-panel[data-rp-manual-view="baby"] .rp-manual-pregnancy { display: none; }
+.reproductive-system-settings .rp-manual-pregnancy > :is(button,.menu_button) { width: 100%; }
+
 /* Tools pane and custom editors */
 .reproductive-system-settings .rp-primary-actions,
 .reproductive-system-settings .rp-utility-actions { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 7px; }
@@ -277,7 +346,7 @@ body[data-rp-light] { --rp-surface-alt: color-mix(in srgb, var(--SmartThemeBlurT
   grid-template-columns: minmax(0,1fr);
 }
 .reproductive-system-settings .rp-primary-actions > button { width: 100%; }
-.reproductive-system-settings .rp-utility-actions { margin-top: 8px; grid-template-columns: minmax(0,1fr) minmax(0,1fr) 38px; }
+.reproductive-system-settings .rp-utility-actions { margin-top: 4px; grid-template-columns: repeat(2,minmax(0,1fr)); }
 .reproductive-system-settings .rp-icon-button { display: grid !important; place-items: center; width: 38px !important; padding: 0 !important; }
 .reproductive-system-settings .rp-meta-row { border-top: 1px solid var(--rp-stroke-soft); margin-top: 8px; }
 .reproductive-system-settings .rp-meta-row .rp-form-card { border: 0 !important; }
@@ -305,6 +374,32 @@ body[data-rp-light] { --rp-surface-alt: color-mix(in srgb, var(--SmartThemeBlurT
 }
 .reproductive-system-settings .rp-css-actions { display: grid; grid-template-columns: 1fr 1fr; }
 .reproductive-system-settings .rp-caption { font-size: .83em; color: var(--rp-muted); }
+
+/* Forms for nontechnical custom symptoms/complications, without replacing saved formats. */
+.rp-profile-dialog .rp-editor-guide,
+.rp-profile-dialog .rp-builder,
+.rp-profile-dialog .rp-raw-editor { border: 1px solid var(--rp-stroke-soft); border-radius: 6px; }
+.rp-profile-dialog .rp-editor-guide { padding: 0 10px 5px; margin: 8px 12px 12px; }
+.rp-profile-dialog .rp-editor-guide > summary,
+.rp-profile-dialog .rp-raw-editor > summary {
+  cursor: pointer; min-height: 35px; padding: 8px 2px;
+  font-weight: 650; color: var(--rp-fg);
+}
+.rp-profile-dialog .rp-editor-guide p { color: var(--rp-muted); margin: 6px 0; line-height: 1.45; }
+.rp-profile-dialog .rp-builder { display: grid; gap: 7px; padding: 9px; }
+.rp-profile-dialog .rp-builder-title { font-weight: 700; }
+.rp-profile-dialog .rp-builder > input { width: 100%; min-width: 0; }
+.rp-profile-dialog .rp-builder-stages { border: 1px solid var(--rp-stroke-soft); padding: 6px 9px; margin: 0; }
+.rp-profile-dialog .rp-builder-stages > legend { color: var(--rp-muted); font-size: .88em; }
+.rp-profile-dialog .rp-builder-stages label { display: inline-flex; align-items: center; gap: 4px; margin-right: 12px; }
+.rp-profile-dialog .rp-builder-stages input { width: 17px; height: 17px; min-height: 17px; }
+.rp-profile-dialog .rp-custom-row { display: flex; align-items: center; gap: 7px; justify-content: space-between; border-top: 1px solid var(--rp-stroke-soft); padding: 4px 0; }
+.rp-profile-dialog .rp-custom-row > span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.rp-profile-dialog .rp-custom-row > button { flex: 0 0 34px; min-width: 34px; width: 34px; min-height: 34px; padding: 0 !important; }
+.rp-profile-dialog .rp-editor-feedback { color: var(--rp-warn); margin: 0; }
+.rp-profile-dialog .rp-editor-feedback:empty, .rp-profile-dialog .rp-custom-list:empty { display: none; }
+.rp-profile-dialog .rp-raw-editor { padding: 0 8px 8px; }
+.rp-profile-dialog .rp-raw-editor .rp-field { display: flex; flex-direction: column; gap: 6px; }
 
 /* Reproductive profiles: slim data-grid instead of stacked cards. */
 .rp-profile-dialog {
@@ -613,10 +708,8 @@ details.repro.repro-multi details.repro { margin: 0; max-width: none; }
   .reproductive-system-settings .rp-mini-options .rp-switch { gap: 5px !important; }
   .reproductive-system-settings .rp-m-weeks-row { grid-template-columns: auto 55px auto; }
   .reproductive-system-settings .rp-m-weeks-row button { grid-column: 1/-1; }
-  .reproductive-system-settings .rp-utility-actions { grid-template-columns: minmax(0,1fr) 38px; }
-  .reproductive-system-settings .rp-utility-actions > :is(#repro-manual-toggle,#repro-css-toggle) { grid-column: 1/-1; }
-  .reproductive-system-settings .rp-utility-actions > #repro-theme-btn { grid-column: 2; justify-self: end; }
-  .reproductive-system-settings #repro-css-toggle { grid-column: 1/-1; }
+  .reproductive-system-settings .rp-event-choices { grid-template-columns: 1fr; }
+  .reproductive-system-settings .rp-utility-actions { grid-template-columns: 1fr; }
 }
 @media (max-width: 760px) {
   .rp-profile-dialog { width: calc(100vw - 16px); max-height: calc(100dvh - 16px); }

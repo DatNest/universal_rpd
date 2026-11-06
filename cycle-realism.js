@@ -59,7 +59,7 @@ export function getHygieneState(typeId, hours, flow) {
              hoursLeft: Math.max(0, Math.round((soft - hours) * 10) / 10) };
 }
 
-// Что фаза делает с телом. Коротко — это идёт в промпт как одна строка.
+// Необязательные идеи для интерфейса: не добавлять их в промпт модели.
 export function getPhaseEffects(day) {
     const d = parseInt(day) || 1;
     if (d <= 5) {
@@ -114,33 +114,4 @@ export function disruptionShift(kind, rnd = Math.random) {
     if (!d) return 0;
     const [min, max] = d.shift;
     return min + Math.floor(rnd() * (max - min + 1));
-}
-
-// Строка о состоянии для промпта — максимально плотно, без воды.
-// Только то, что тело чувствует СЕЙЧАС, плюс гигиена, если идут месячные.
-export function realismPromptLine(day, hygieneState, opts = {}) {
-    const eff = getPhaseEffects(day);
-    const en = opts.lang !== 'ru';
-    const parts = [];
-    parts.push(en ? `${eff.labelEn} (cycle day ${day})` : `${eff.label} (день ${day})`);
-    parts.push(en ? eff.bodyEn : eff.body);
-
-    if (eff.key === 'menstruation' && hygieneState) {
-        const h = hygieneState;
-        const flowWord = en ? eff.flow.labelEn : eff.flow.label;
-        parts.push(en ? `bleeding: ${flowWord}` : `кровотечение: ${flowWord}`);
-        if (h.type.id === 'none') {
-            parts.push(en ? 'no protection in use — will stain through' : 'без средств — протечёт');
-        } else if (h.overdue) {
-            parts.push(en
-                ? `${h.labelEn} is well past due (${Math.round(h.hours)}h) — leaking is likely`
-                : `${h.label} давно пора сменить (${Math.round(h.hours)} ч) — вот-вот протечёт`);
-        } else if (h.needsChange) {
-            parts.push(en ? `${h.labelEn} needs changing soon` : `${h.label} пора менять`);
-        }
-        if (h.health === 'tampon-too-long') {
-            parts.push(en ? 'tampon in over 8h — a real health risk' : 'тампон больше 8 часов — это уже опасно');
-        }
-    }
-    return parts.join('; ');
 }

@@ -73,6 +73,7 @@ export const defaultPregnancyData = {
     lastCycleUpdate: null,
     conceptionDate: null,
     pregnancyWeeks: 0,
+    _manualPregnancy: false, // данная беременность начата через ручную настройку
     rpDate: null,
     _lastRpDateTag: null,
     fetusCount: 1,
@@ -142,6 +143,7 @@ export const defaultPartnerData = {
     lastCycleUpdate: null,
     conceptionDate: null,
     pregnancyWeeks: 0,
+    _manualPregnancy: false, // данная беременность начата через ручную настройку
     fetusCount: 1,
     fetusSex: [],
     fetusSexRevealed: false,

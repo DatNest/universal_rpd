@@ -1,5 +1,6 @@
 import {cycleLength,profile,phase,care,termInfo,bodyDay} from './reproductive-engine.js';
 import {openReproductiveSettings} from './reproductive-ui.js';
+import {installInterfaceHelp} from './interface-help.js';
 import { setManualCycleDay, setManualPregnancyWeeks, setSecondParent } from './message-handler.js';
 import { reportError } from './diagnostics.js';
 function cycleSummary(who, c, s) {
@@ -187,10 +188,11 @@ function hpBadge(status) {
 }
 
 function getCycleDetails(day) {
-    if (day <= 5) return { fertility: 'Низкая', libido: 'Низкое', mood: 'Усталость', physical: 'Спазмы', note: 'Менструация — низкая фертильность. Спазмы, усталость, перепады настроения.' };
-    if (day <= 11) return { fertility: 'Средняя', libido: 'Среднее', mood: 'Энергичное', physical: 'Энергия растёт', note: 'Фолликулярная фаза — фертильность растёт. Энергия и настроение улучшаются.' };
-    if (day <= 16) return { fertility: 'Высокая', libido: 'Высокое', mood: 'Кокетливое', physical: 'Чувствительность', note: 'Овуляция — пик фертильности. Повышенная чувствительность, лёгкая влажность, кокетливое настроение.' };
-    return { fertility: 'Низкая', libido: 'Низкое', mood: 'ПМС', physical: 'Вздутие', note: 'Лютеиновая фаза — низкая фертильность. Возможны ПМС, вздутие, раздражительность.' };
+    // Possibilities for the player to choose from, never required behaviour.
+    if (day <= 5) return { fertility: 'Низкая', libido: 'По сцене', mood: 'По сцене', physical: 'По сцене', note: 'Возможные детали отыгрыша: спазмы или усталость. Ни одно ощущение или настроение не обязательно.' };
+    if (day <= 11) return { fertility: 'Средняя', libido: 'По сцене', mood: 'По сцене', physical: 'По сцене', note: 'Фолликулярная фаза. Настроение, желание и самочувствие персонажа определяются только сюжетом.' };
+    if (day <= 16) return { fertility: 'Высокая', libido: 'По сцене', mood: 'По сцене', physical: 'По сцене', note: 'Овуляция. Возможные телесные признаки — только идеи для отыгрыша, а не обязательные события.' };
+    return { fertility: 'Низкая', libido: 'По сцене', mood: 'По сцене', physical: 'По сцене', note: 'Лютеиновая фаза. Возможны индивидуальные проявления ПМС, но ни настроение, ни ощущения не предписаны.' };
 }
 
 function getBabies(p) {
@@ -507,9 +509,9 @@ function cycleCardHtml(who, c, tr) {
             ${cycling ? `<div class="repro-bar"><div class="repro-bar-fill cycle" style="width:${cyclePct}%"></div></div>` : ''}
             <div class="repro-grid">
                 ${carries ? stat('fa-droplet', 'green', 'Фертильность', hidden || delay > 0 ? 'Не определена' : pp && !pp.cycleReturned ? 'Очень низкая' : cd.fertility) : stat('fa-clock', 'purple', 'Фаза', phase.name)}
-                ${stat('fa-fire', 'pink', 'Либидо', tr(d.libido) || cd.libido)}
-                ${stat('fa-face-smile', 'purple', 'Настроение', tr(d.mood) || cd.mood)}
-                ${stat('fa-heart', 'blue', 'Физически', tr(d.physical) || cd.physical)}
+                ${stat('fa-fire', 'pink', d.libido?'Либидо по сцене':'Либидо · на усмотрение', tr(d.libido) || cd.libido)}
+                ${stat('fa-face-smile', 'purple', d.mood?'Настроение по сцене':'Настроение · на усмотрение', tr(d.mood) || cd.mood)}
+                ${stat('fa-heart', 'blue', d.physical?'Самочувствие по сцене':'Самочувствие · на усмотрение', tr(d.physical) || cd.physical)}
                 ${extraRows}
                 <div class="repro-note">${tr(d.note) || (hidden || delay > 0 ? 'Ориентируйтесь на самочувствие и факты сцены.' : pp && !pp.cycleReturned ? 'Цикл ещё не возобновился.' : cd.note)}</div>
             </div>
@@ -1323,17 +1325,27 @@ export function setupUI() {
     <div class="inline-drawer-content">
         <div class="reproductive-system-settings" data-rp-tab="state">
             <nav class="rp-nav" aria-label="Разделы репродуктивной системы">
-                <button type="button" class="rp-tab is-active" data-rp-view="state" aria-pressed="true"><i class="fa-solid fa-heart-pulse" aria-hidden="true"></i> Состояние</button>
-                <button type="button" class="rp-tab" data-rp-view="settings" aria-pressed="false"><i class="fa-solid fa-sliders" aria-hidden="true"></i> Настройки</button>
-                <button type="button" class="rp-tab" data-rp-view="tools" aria-pressed="false"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> Действия</button>
+                <button type="button" class="rp-tab is-active" data-rp-view="state" aria-pressed="true"><i class="fa-solid fa-heart-pulse" aria-hidden="true"></i> Сейчас</button>
+                <button type="button" class="rp-tab" data-rp-view="settings" aria-pressed="false"><i class="fa-solid fa-sliders" aria-hidden="true"></i> Персонажи</button>
+                <button type="button" class="rp-tab" data-rp-view="tools" aria-pressed="false"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> События</button>
             </nav>
             <div class="rp-dashboard-shell">
                 <div class="rp-main-grid">
                     <section class="rp-card rp-card-controls" aria-label="Настройки отслеживания">
                         <div class="rp-card-head">
-                            <p class="rp-card-kicker">ПАРАМЕТРЫ</p>
+                            <p class="rp-card-kicker">КОГО И ЧТО ОТСЛЕЖИВАТЬ</p>
                             <h3>Отслеживание</h3>
                         </div>
+
+                        <details class="rp-onboarding">
+                            <summary><i class="fa-regular fa-circle-question" aria-hidden="true"></i> С чего начать?</summary>
+                            <ol>
+                                <li>Выбери, кого отслеживать, и кто может вынашивать.</li>
+                                <li>Открой «Особенности персонажей» и укажи тип цикла. Остальные параметры можно оставить стандартными.</li>
+                                <li>Играй как обычно: события обновляются по сюжету. Во вкладке «Сейчас» можно проверить состояние.</li>
+                            </ol>
+                            <p>Настройки сохраняются автоматически. Знаки вопроса и подсказки при наведении объясняют каждое действие.</p>
+                        </details>
 
                         <div class="rp-switch-stack">
                             <label class="checkbox_label rp-switch"><input type="checkbox" id="repro-enabled"><span>${L('enabled')}</span></label>
@@ -1342,13 +1354,13 @@ export function setupUI() {
 
                         <div class="rp-dual-fields">
                             <div class="rp-field-card rp-track-select">
-                                <label for="repro-trackfor">Отслеживать</label>
+                                <label for="repro-trackfor">Кого отслеживать?</label>
                                 <select id="repro-trackfor" class="text_pole">
                                     <option value="user">Меня</option><option value="char">Бота</option><option value="both">Обоих</option>
                                 </select>
                             </div>
                             <div class="rp-field-card rp-carrier-select">
-                                <label for="repro-carrier-mode">Вынашивание</label>
+                                <label for="repro-carrier-mode">Кто может вынашивать?</label>
                                 <select id="repro-carrier-mode" class="text_pole">
                                     <option value="user">Вынашиваю я</option>
                                     <option value="char">Вынашивает бот</option>
@@ -1358,7 +1370,7 @@ export function setupUI() {
                             </div>
                         </div>
 
-                        <button type="button" id="rp-open-profiles" class="menu_button rp-button-primary">◷ Раса, цикл и беременность</button>
+                        <button type="button" id="rp-open-profiles" class="menu_button rp-button-primary">◷ Особенности персонажей</button>
 
                         <div id="repro-partner-cycle-row" class="rp-partner-editor rp-inline-card">
                             <div class="rp-inline-copy">
@@ -1371,19 +1383,19 @@ export function setupUI() {
 
                         <div class="rp-settings-cluster">
                             <div id="repro-contraception-user-box" class="rp-form-card">
-                                <label id="repro-contra-user-label" for="repro-contraception-user">Контрацепция {{user}}</label>
+                                <label id="repro-contra-user-label" for="repro-contraception-user">Защита от беременности · {{user}}</label>
                                 <select id="repro-contraception-user" class="text_pole">
                                     <option value="none">Нет</option><option value="condom">Презерватив</option><option value="pill">Таблетки</option><option value="iud">ВМС</option>
                                 </select>
                             </div>
                             <div id="repro-contraception-char-box" class="rp-form-card" style="display:none">
-                                <label id="repro-contra-char-label" for="repro-contraception-char">Контрацепция {{char}}</label>
+                                <label id="repro-contra-char-label" for="repro-contraception-char">Защита от беременности · {{char}}</label>
                                 <select id="repro-contraception-char" class="text_pole">
                                     <option value="none">Нет</option><option value="condom">Презерватив</option><option value="pill">Таблетки</option><option value="iud">ВМС</option>
                                 </select>
                             </div>
                             <div class="rp-form-card rp-form-split">
-                                <label for="repro-duration">Длит. берем.</label>
+                                <label for="repro-duration">Длительность беременности</label>
                                 <div class="rp-inline-inputs">
                                     <select id="repro-duration" class="text_pole">
                                         <option value="12">12 нед.</option><option value="16">16</option>
@@ -1396,7 +1408,7 @@ export function setupUI() {
                                 </div>
                             </div>
                             <div class="rp-form-card" title="После этого возраста ребёнок «выпускается» из инфоблока — остаётся в семье, но без отслеживания подгузников/кормления.">
-                                <label for="repro-baby-max-age">Малыш до</label>
+                                <label for="repro-baby-max-age">Уход за малышом до</label>
                                 <select id="repro-baby-max-age" class="text_pole">
                                     <option value="180">6 мес.</option>
                                     <option value="365">1 год</option>
@@ -1409,14 +1421,14 @@ export function setupUI() {
                         </div>
 
                         <div class="rp-mini-options">
-                            <label class="checkbox_label rp-switch rp-switch-soft" title="Скрывать неподтверждённую беременность; учитывать тесты, раскрытие и факты текущей сцены"><input type="checkbox" id="repro-hidden-preg"><span>Скрытая беременность (тест)</span></label>
-                            <label class="checkbox_label rp-switch rp-switch-soft" title="Цикл становится частью РП: гигиена и протечки в месячные, самочувствие по фазам, сбои цикла от стресса или болезни"><input type="checkbox" id="repro-realism"><span>Реализм цикла</span></label>
+                            <label class="checkbox_label rp-switch rp-switch-soft" title="Скрывать неподтверждённую беременность; учитывать тесты, раскрытие и факты текущей сцены"><input type="checkbox" id="repro-hidden-preg"><span>Скрывать беременность до подтверждения</span></label>
+                            <label class="checkbox_label rp-switch rp-switch-soft" title="Учитывать сюжетные события, влияющие на длительность цикла, и показывать в интерфейсе необязательные подсказки по фазам. Настроение и ощущения модели не предписываются."><input type="checkbox" id="repro-realism"><span>Учитывать цикл в сюжете</span></label>
                         </div>
                     </section>
 
                     <section class="rp-card rp-card-status" aria-label="Текущее состояние">
                         <div class="rp-card-head rp-card-head-compact">
-                            <p class="rp-card-kicker">ТЕКУЩАЯ СЦЕНА</p>
+                            <p class="rp-card-kicker">СЕЙЧАС В ИСТОРИИ</p>
                         </div>
 
                         <div id="repro-currentcycle" class="rp-cycle-banner"></div>
@@ -1441,38 +1453,34 @@ export function setupUI() {
 
                 <section class="rp-card rp-card-actions">
                     <div class="rp-card-head rp-card-head-compact">
-                        <p class="rp-card-kicker">УПРАВЛЕНИЕ СЮЖЕТОМ</p>
+                        <p class="rp-card-kicker">СОБЫТИЯ И ИНСТРУМЕНТЫ</p>
                     </div>
 
-                    <div class="rp-primary-actions">
-                        <button id="repro-family-tree-btn" class="menu_button"><i class="fa-solid fa-people-roof" style="margin-right:6px"></i>Семейное древо</button>
-                        <button id="repro-force-birth-btn" class="menu_button" style="display:none"><i class="fa-solid fa-baby" style="margin-right:6px"></i>Принять роды сейчас</button>
+                    <div class="rp-primary-actions rp-event-actions">
+                        <button id="repro-family-tree-btn" class="menu_button"><i class="fa-solid fa-people-roof" aria-hidden="true"></i> Посмотреть семью</button>
+                        <button id="repro-force-birth-btn" class="menu_button" style="display:none"><i class="fa-solid fa-baby" aria-hidden="true"></i> Отметить состоявшиеся роды</button>
                     </div>
-
-                    <div class="rp-utility-actions">
-                        <button id="repro-manual-toggle" class="menu_button rp-ghost-button" type="button">Ручная беременность / малыш <span aria-hidden="true">▼</span></button>
-                        <button id="repro-css-toggle" class="menu_button rp-ghost-button" type="button">CSS инфоблока <span aria-hidden="true">▼</span></button>
-                        <div id="repro-theme-btn" class="menu_button rp-icon-button" title="Стиль"><span class="rp-theme-glyph" aria-hidden="true">◌</span></div>
+                    <div class="rp-event-choices" aria-label="Добавить событие вручную">
+                        <button id="repro-manual-toggle" class="menu_button rp-event-choice" type="button" aria-expanded="false" aria-controls="repro-manual-panel"><i class="fa-solid fa-heart-pulse" aria-hidden="true"></i> Задать беременность</button>
+                        <button id="repro-open-baby" class="menu_button rp-event-choice" type="button" aria-expanded="false" aria-controls="repro-manual-panel"><i class="fa-solid fa-baby-carriage" aria-hidden="true"></i> Добавить ребёнка</button>
                     </div>
 
                     <div id="repro-manual-panel" class="rp-expanded-panel" style="display:none">
-                        <div class="rp-expanded-head">
-                            <span class="rp-mini-kicker">Ручное управление</span>
-                            <strong>Беременность</strong>
-                        </div>
+                        <div class="rp-manual-pregnancy">
+                        <div class="rp-expanded-head"><strong>Задать беременность</strong></div>
                         <div id="repro-manual-who-row" class="rp-form-card rp-form-inline">
-                            <label for="repro-manual-who">Носитель</label>
+                            <label for="repro-manual-who">Кто вынашивает?</label>
                             <select id="repro-manual-who" class="text_pole">
                                 <option value="user">Я</option>
                                 <option value="char">Персонаж</option>
                             </select>
                         </div>
                         <div class="rp-form-card rp-form-inline">
-                            <label for="repro-manual-conception-date">Зачатие</label>
+                            <label for="repro-manual-conception-date">Дата зачатия в сюжете</label>
                             <input type="date" id="repro-manual-conception-date" class="text_pole" title="RP-дата (не реальная). Недели посчитаются от этой даты до текущего RP_DATE в чате.">
                         </div>
                         <div class="rp-form-card rp-form-inline rp-manual-fetus-row">
-                            <label for="repro-manual-fetus">Плодов</label>
+                            <label for="repro-manual-fetus">Количество плодов</label>
                             <div class="rp-inline-inputs">
                                 <input type="number" id="repro-manual-fetus" min="1" max="4" value="1" class="text_pole">
                                 <select id="repro-manual-sex" class="text_pole">
@@ -1483,14 +1491,15 @@ export function setupUI() {
                             </div>
                         </div>
                         <div class="rp-form-card">
-                            <label for="repro-manual-second-parent">Второй родитель</label>
+                            <label for="repro-manual-second-parent">Имя второго родителя</label>
                             <input type="text" id="repro-manual-second-parent" class="text_pole" maxlength="80" placeholder="Имя второго родителя" title="Для текущей беременности имя сохраняется при завершении ввода; для новой — при нажатии «Начать беременность».">
                         </div>
                         <button id="repro-manual-start" class="menu_button rp-button-primary">Начать беременность</button>
 
+                        </div>
+                        <div class="rp-manual-child">
                         <div class="rp-expanded-head rp-expanded-head-secondary">
-                            <strong>Малыш</strong>
-                            <span class="rp-mini-note">добавляется к существующим</span>
+                            <strong>Добавить ребёнка</strong><span class="rp-mini-note">к уже существующим</span>
                         </div>
                         <div class="rp-form-card rp-form-inline rp-baby-top-row">
                             <input type="text" id="repro-mb-name" class="text_pole" maxlength="60" placeholder="Имя">
@@ -1520,12 +1529,19 @@ export function setupUI() {
                             <button id="repro-reset-baby" class="menu_button redWarningBG" style="display:none">Сброс малыша</button>
                             <button id="repro-undo" class="menu_button">↶ Отменить последний сброс/удаление</button>
                         </div>
+                        </div>
                     </div>
 
+                    <details class="rp-advanced-options">
+                        <summary><i class="fa-solid fa-gear" aria-hidden="true"></i> Дополнительные настройки</summary>
+                        <div class="rp-utility-actions">
+                            <button id="repro-css-toggle" class="menu_button rp-ghost-button" type="button" aria-expanded="false" aria-controls="repro-css-panel">Оформление сводки в чате</button>
+                            <button id="repro-theme-btn" class="menu_button rp-ghost-button" title="Тематическое оформление" type="button">Внешний вид</button>
+                        </div>
                     <div id="repro-css-panel" class="rp-expanded-panel" style="display:none">
                         <div class="rp-expanded-head">
                             <span class="rp-mini-kicker">Кастомизация</span>
-                            <strong>CSS инфоблока</strong>
+                            <strong>Оформление сводки в чате</strong>
                         </div>
                         <textarea id="repro-custom-css" class="text_pole rp-code-area" rows="10" placeholder="/* Свой CSS для инфоблока */
 details.repro { ... }"></textarea>
@@ -1538,7 +1554,7 @@ details.repro { ... }"></textarea>
 
                     <div class="rp-meta-row">
                         <div class="rp-form-card rp-form-inline">
-                            <label for="repro-infoblock">Инфоблок</label>
+                            <label for="repro-infoblock">Сводка в чате</label>
                             <select id="repro-infoblock" class="text_pole">
                                 <option value="off">Выкл.</option>
                                 <option value="top">Вверху</option>
@@ -1547,18 +1563,20 @@ details.repro { ... }"></textarea>
                         </div>
                         <label class="checkbox_label rp-light-switch rp-switch rp-switch-soft">
                             <input type="checkbox" id="repro-light-mode">
-                            <span>Светлая тема</span>
+                            <span>Осветлить поверхности</span>
                         </label>
                     </div>
 
-                    <button id="repro-purge-tags" class="menu_button rp-ghost-button" title="Убрать технические теги из текста сообщений этого чата — модель перестанет их видеть">Вычистить теги из чата</button>
+                    <button id="repro-purge-tags" class="menu_button rp-ghost-button" title="Убрать технические теги из текста сообщений этого чата — модель перестанет их видеть">Скрыть служебные метки из чата</button>
                     <small id="repro-stats">0 / 0</small>
+                    </details>
                 </section>
             </div>
         </div>
     </div>
 </div>`;
         $('#extensions_settings2').append(html);
+        installInterfaceHelp();
         // Presentation-only tabs. Existing control IDs, values and event handlers are unchanged.
         const $dashboard = $('#extensions_settings2 .reproductive-system-settings').last();
         $dashboard.find('.rp-tab').on('click', function () {
@@ -1725,13 +1743,20 @@ details.repro { ... }"></textarea>
             showNotification(label ? `Отменено: ${label}` : 'Нечего отменять', label ? 'success' : 'info');
         });
 
-        // Manual pregnancy/baby toggle (объединённая панель)
-        $('#repro-manual-toggle').on('click', function() {
+        // Two separate actions share the existing editor and event handlers.
+        // Only their visible section changes; all original inputs remain mounted.
+        const showManualEditor = (view) => {
             const panel = $('#repro-manual-panel');
             const visible = panel.is(':visible');
-            panel.css('display', visible ? 'none' : 'grid');
-            $(this).text(visible ? 'Ручная беременность / малыш ▼' : 'Ручная беременность / малыш ▲');
-        });
+            const same = panel.attr('data-rp-manual-view') === view;
+            const opening = !visible || !same;
+            panel.attr('data-rp-manual-view', view).css('display', opening ? 'grid' : 'none');
+            $('#repro-manual-toggle').attr('aria-expanded', String(opening && view === 'pregnancy'));
+            $('#repro-open-baby').attr('aria-expanded', String(opening && view === 'baby'));
+            if(opening) panel.find(view === 'baby' ? '#repro-mb-name' : '#repro-manual-who').trigger('focus');
+        };
+        $('#repro-manual-toggle').on('click', () => showManualEditor('pregnancy'));
+        $('#repro-open-baby').on('click', () => showManualEditor('baby'));
 
         $('#repro-manual-baby-add').on('click', function() {
             if (warnIfNoChat()) return;
@@ -1855,7 +1880,7 @@ details.repro { ... }"></textarea>
             const panel = $('#repro-css-panel');
             const visible = panel.is(':visible');
             panel.css('display', visible ? 'none' : 'grid');
-            $(this).text(visible ? 'CSS инфоблока ▼' : 'CSS инфоблока ▲');
+            $(this).attr('aria-expanded', String(!visible));
             if (!visible) {
                 const ta = $('#repro-custom-css');
                 if (!ta.val()) {

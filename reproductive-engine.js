@@ -192,7 +192,7 @@ export function completeCare(c) {
         return true;
     }
     if (['loss','frozen'].includes(a.event)) {
-        c._lastPregnancyOutcome=a.event;c.isPregnant=false;c._userSetWeeksAt=Date.now();c._dynamic={};c.fetusCount=0;c.fetusSex=[];
+        c._lastPregnancyOutcome=a.event;c.isPregnant=false;c._manualPregnancy=false;c._userSetWeeksAt=Date.now();c._dynamic={};c.fetusCount=0;c.fetusSex=[];
         c.fetusSexRevealed=false;c.pregnancyKnown=false;c.healthStatus='normal';c.conceptionDate=null;c.pregnancyWeeks=0;
         c._plannedComplications=[];c._conceptionAnchored=false;c.lastTestResult=null;c.testTakenAt=null;c.complications=[];
         a.event=null;a.load=0;a.nextVisit='';a.recovery=true;a.result='Потеря беременности; восстановление по сюжету.';

@@ -598,6 +598,7 @@ export async function scanFullHistory() {
     createUndoCheckpoint('Полное пересканирование чата');
     const savedUserPregnancy = p.isPregnant ? structuredClone({
         isPregnant: p.isPregnant, conceptionDate: p.conceptionDate, pregnancyWeeks: p.pregnancyWeeks,
+        _manualPregnancy: p._manualPregnancy,
         _conceptionAnchored: p._conceptionAnchored, fetusCount: p.fetusCount, fetusSex: p.fetusSex,
         fetusSexRevealed: p.fetusSexRevealed, complications: p.complications, _plannedComplications: p._plannedComplications,
         healthStatus: p.healthStatus, pregnancyKnown: p.pregnancyKnown, testTakenAt: p.testTakenAt,

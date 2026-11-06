@@ -1,13 +1,12 @@
-import {cycleLength,profile,phase,care,bodyDay,termInfo,conceptionChance} from './reproductive-engine.js';
+import {cycleLength,profile,phase,care,termInfo,conceptionChance} from './reproductive-engine.js';
 import {runtimePrompt} from './care-runtime.js';
 import {reportError} from './diagnostics.js';
 import {setExtensionPrompt,extension_prompts,extension_prompt_types,extension_prompt_roles} from '../../../../script.js';
 import {extensionName} from './config.js';
 import {getSettings,getPregnancyData,getPartnerData,getCycleDay,isTracked,getContraception} from './state.js';
-import {hasMenstrualCycle,canCarry,hasCycle} from './omegaverse.js';
+import {canCarry,hasCycle} from './omegaverse.js';
 import {pregnancyIsKnown,getPostpartum,monthsTrying} from './pregnancy.js';
 import {conceptionStruggle} from './fertility.js';
-import {getFlow,getHygieneState,hoursBetween} from './cycle-realism.js';
 import {detectChatLanguage} from './helpers.js';
 import {babyAgeDays} from './baby-care.js';
 
@@ -25,27 +24,16 @@ function carrierCycleLine(who,s,p) {
         if(pp && !pp.cycleReturned)details.push('postpartum; cycle paused');
         else {
             const day=who==='user'?getCycleDay():c.cycleDay||1;
+            // Menstrual and PMS phases are informational UI hints only. Never
+            // instruct the model to infer a person's mood, libido or bodily sensations.
+            // Keep the neutral cycle counter: conception calculations use it.
             const ph=phase(s,who,day,p.rpDate,'en');
-            const names=[ph.name];
-            if(ph.rut && ph.name!=='Rut')names.push('Rut');
-            if(ph.bleeding && ph.name!=='Menstruation')names.push('Menstruation');
-            details.push(hasCycle(s,who)?`cycle day ${day}/${cycleLength(s,who)}; ${names.join(', ')}`:names.join(', '));
+            const cycle=hasCycle(s,who)?`cycle day ${day}/${cycleLength(s,who)}`:'';
+            const special=[ph.heat?'Heat':null,ph.rut?'Rut':null].filter(Boolean).join(', ');
+            if(cycle || special)details.push([cycle,special].filter(Boolean).join('; '));
         }
     }
     return details.length?`${who}: ${details.join('; ')}.\n`:'';
-}
-function hygieneBlock(s,p,active) {
-    const lines=[];
-    for(const who of active) {
-        const c=who==='user'?p:getPartnerData();
-        const pp=getPostpartum(c,p);
-        if(c.isPregnant || care(c).maternalDeath || pp&&!pp.cycleReturned || !hasMenstrualCycle(s,who))continue;
-        if(!phase(s,who,c.cycleDay||1,p.rpDate).bleeding)continue;
-        const h=getHygieneState(c.hygieneType||'pad',hoursBetween(c.hygieneChangedRpDate,p.rpDate),getFlow(bodyDay(s,who,c.cycleDay||1)));
-        if(h.needsChange)lines.push(`${who}: ${h.type.id==='none'?'no menstrual hygiene product recorded':'hygiene change due'}; only observable signs enter the scene.`);
-    }
-    if(s.realism && active.includes('user') && !p.isPregnant && hasCycle(s,'user'))lines.push('RP_STATUS cycle_event=stress|illness|starvation|travel|overtrain only for a new severe cycle-disrupting event in this scene.');
-    return lines.length?lines.join('\n')+'\n':'';
 }
 export function getBasePrompt() {
     const s=getSettings(), p=getPregnancyData();
@@ -56,7 +44,11 @@ export function getBasePrompt() {
     b+='RP_STATUS root concerns user; partner concerns char. Tracker state is private until observed, disclosed, examined or detectable by established abilities. Do not decide the player’s actions or feelings.\n';
     if(p.rpDate)b+=`RP time: ${new Date(p.rpDate).toLocaleString('en-GB',{hour12:false})}. Advance only with elapsed story time.\n`;
     b+=active.map(w=>carrierCycleLine(w,s,p)).join('');
-    b+=runtimePrompt(s,p)+hygieneBlock(s,p,active);
+    b+=runtimePrompt(s,p);
+    // A disruption marker can report an explicit severe scene event to the engine,
+    // not a phase-based feeling or automatic menstrual behaviour.
+    if(s.realism && active.includes('user') && !p.isPregnant && hasCycle(s,'user'))
+        b+='RP_STATUS cycle_event=stress|illness|starvation|travel|overtrain only if a new severe event was already established in this scene. No inferred symptoms or moods.\n';
     for(const who of active) {
         const c=who==='user'?p:getPartnerData();
         if(c.isPregnant || care(c).maternalDeath || !canCarry(s,who))continue;
@@ -65,7 +57,7 @@ export function getBasePrompt() {
     }
     if(active.includes('char'))b+=compactPregnancy('char',s);
     if(active.includes('user') && s.tryingToConceive && !p.isPregnant && !care(p).maternalDeath)b+=tryingBlock(s,p);
-    const fields=c=>care(c).maternalDeath || care(c).event?{note:''}:c.isPregnant&&pregnancyIsKnown(c,s)?{mood:'',symptoms:'',fetus_size:'',note:''}:{libido:'',mood:'',physical:'',note:''};
+    const fields=c=>care(c).maternalDeath || care(c).event?{note:''}:c.isPregnant&&pregnancyIsKnown(c,s)?{mood:'',symptoms:'',fetus_size:'',note:''}:{note:''};
     const status={subject:'user',...(active.includes('user')?fields(p):{})};
     if(active.includes('char'))status.partner={subject:'char',...fields(getPartnerData())};
     if(p.hasBaby)status.babies=p.babies.map((c,i)=>({label:c.name||`Baby${i+1}`,mood:'',sleep:'',feeding:'',diaper:'',care_note:''}));

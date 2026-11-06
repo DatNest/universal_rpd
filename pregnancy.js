@@ -200,6 +200,7 @@ export function applyScanResult(result) {
         // беременность, но и RP-дату, цикл, партнёра, историю/undo, родительские черты
         // и семейные данные. Сбрасываем только поля ТЕКУЩЕЙ беременности {{user}}.
         p.isPregnant = false;
+        p._manualPregnancy = false;
         p.conceptionDate = null;
         p.pregnancyWeeks = 0;
         p._conceptionAnchored = false;
@@ -506,6 +507,7 @@ export function checkConception() {
 
     if (success) {
         p.isPregnant = true; p._care = null; p._pregnancySequence=(p._pregnancySequence||0)+1; p.complications=[]; p.healthStatus='normal'; p.fetusSexRevealed=false;
+        p._manualPregnancy = false;
         s._birthBlockedUntilUser = null;
         // Anchor conception STRICTLY to current rpDate. Никаких следов старых беременностей —
         // даже если в p случайно остались поля conceptionDate/pregnancyWeeks от прошлой беременности,
@@ -569,6 +571,7 @@ export function terminatePregnancy(reason) {
     if (!p.isPregnant) return false;
     p._care=null;
     p.isPregnant = false;
+    p._manualPregnancy = false;
     p.conceptionDate = null;
     p.pregnancyWeeks = 0;
     p.fetusCount = 1;
@@ -684,6 +687,7 @@ export function createPregnancyFromWeeks(weeks, { notify = true } = {}) {
 
     const anchor = p.rpDate ? new Date(p.rpDate) : null;
     p.isPregnant = true; p._care = null; p._pregnancySequence=(p._pregnancySequence||0)+1; p.complications=[]; p.healthStatus='normal'; p.fetusSexRevealed=false;
+    p._manualPregnancy = false;
     p.conceptionDate = anchor ? new Date(anchor.getTime() - w * 7 * 86400000).toISOString() : null;
     p._conceptionAnchored = true;
     p.pregnancyWeeks = w;
@@ -716,6 +720,7 @@ export function createPregnancyFromStateTag(pregState, { notify = true } = {}) {
     if (isNaN(conceptionMs)) return false;
 
     p.isPregnant = true; p._care = null; p._pregnancySequence=(p._pregnancySequence||0)+1; p.complications=[]; p.healthStatus='normal'; p.fetusSexRevealed=false;
+    p._manualPregnancy = false;
     p.conceptionDate = pregState.conceptionDate;
     p._conceptionAnchored = true;
     p.fetusCount = pregState.fetusCount || 1;
@@ -757,6 +762,10 @@ export function startManualPregnancy(conceptionDateISO, fetusCount, fetusSex = n
         p._secondParentManual = true;
     }
     p.isPregnant = true; p._care = null; p._pregnancySequence=(p._pregnancySequence||0)+1; p.complications=[]; p.healthStatus='normal'; p.fetusSexRevealed=false;
+    p._manualPregnancy = true;
+    p.pregnancyKnown = false;
+    p.lastTestResult = null;
+    p.testTakenAt = null;
     p.conceptionDate = conceptionDateISO;
     // Привязка: ручная дата зачатия — это RP-дата, не real-world.
     // Помечаем как уже привязанную, чтобы processDateTag не перезаписал её при первом RP_DATE.
@@ -826,6 +835,7 @@ export function startManualBaby(babiesData) {
     const nowRp = p.rpDate ? new Date(p.rpDate) : new Date();
 
     p.isPregnant = false;
+    p._manualPregnancy = false;
     p.conceptionDate = null;
     p.pregnancyWeeks = 0;
     p.fetusCount = 0;
@@ -980,6 +990,7 @@ export function partnerCheckConception() {
 
     if (success) {
         c.isPregnant = true; c._care = null; c._pregnancySequence=(c._pregnancySequence||0)+1;
+        c._manualPregnancy = false;
         c.pregnancyKnown = !s.hiddenPregnancy;
         c.lastTestResult = null;
         s._birthBlockedUntilChar = null;
@@ -1024,6 +1035,7 @@ export function partnerBirth(babyTraits, options = {}) {
 
     // Сброс беременности партнёра
     c.isPregnant = false;
+    c._manualPregnancy = false;
     c.conceptionDate = null;
     c.pregnancyWeeks = 0;
     c.fetusCount = 1;
@@ -1127,6 +1139,10 @@ export function startPartnerPregnancy(conceptionDateISO, fetusCount, fetusSex = 
         c._secondParentManual = true;
     }
     c.isPregnant = true; c._care = null; c._pregnancySequence=(c._pregnancySequence||0)+1;
+    c._manualPregnancy = true;
+    c.pregnancyKnown = false;
+    c.lastTestResult = null;
+    c.testTakenAt = null;
     c.conceptionDate = conceptionDateISO;
     c._conceptionAnchored = true;
     c._userSetWeeksAt = Date.now();
@@ -1156,6 +1172,7 @@ export function resetPartnerPregnancy() {
     const c = getPartnerData();
     if (c.isPregnant) createUndoCheckpoint('Сброс беременности персонажа');
     c.isPregnant = false;
+    c._manualPregnancy = false;
     c.conceptionDate = null;
     c.pregnancyWeeks = 0;
     c.fetusCount = 1;
@@ -1198,7 +1215,12 @@ export function takePregnancyTest(who = 'user') {
     const c = who === 'char' ? getPartnerData() : p;
 
     const days = daysSinceConception(c, p);
-    const result = rollTest(!!c.isPregnant, days);
+    // Ручная беременность: введённый срок — подтверждённый пользователем
+    // сюжетный факт. Если срок строго больше двух недель, тест положительный
+    // даже без RP_DATE, и случайный бросок его не опровергает.
+    // Автоматические беременности по-прежнему используют rollTest.
+    const result = c.isPregnant && c._manualPregnancy === true && Number(c.pregnancyWeeks) > 2
+        ? 'positive' : rollTest(!!c.isPregnant, days);
 
     c.lastTestResult = result;
     c.testTakenAt = p.rpDate || null;
