@@ -34,144 +34,18 @@ import { showNotification } from './notifications.js';
 function ic(n) { return `<i class="fa-solid ${n}"></i>`; }
 
 // ── Default infoblock CSS (shown in editor for customization) ──
-const DEFAULT_INFOBLOCK_CSS = `/* === Инфоблок: основной контейнер === */
+const DEFAULT_INFOBLOCK_CSS = `/* Инфоблок: цвета всегда из выбранной CSS-темы SillyTavern. */
 details.repro {
-  margin: 0 auto 12px;
-  max-width: 420px;
-  font: 12px system-ui, sans-serif;
-  color: rgba(255,255,255,.85);
+  color: var(--SmartThemeBodyColor);
+  background: var(--SmartThemeBlurTintColor);
+  border: 1px solid var(--SmartThemeBorderColor);
 }
-
-/* === Шапка === */
-details.repro .repro-header {
-  display: flex; align-items: center; gap: 10px;
-  padding: 10px 16px;
-  background: transparent;
-  border: 1.5px solid rgba(255,255,255,.18);
-  border-radius: 14px;
-  transition: border-radius .2s;
-}
-details.repro[open] .repro-header {
-  border-radius: 14px 14px 0 0;
-  border-bottom-color: transparent;
-}
-
-/* === Иконка в круге === */
-details.repro .repro-icon {
-  width: 26px; height: 26px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-details.repro .repro-icon i { font-size: 11px; }
-details.repro .repro-icon.cycle      { border: 1.5px solid rgba(180,120,255,.4); }
-details.repro .repro-icon.cycle i    { color: rgba(180,120,255,.8); }
-details.repro .repro-icon.pregnancy  { border: 1.5px solid rgba(255,120,180,.4); }
-details.repro .repro-icon.pregnancy i{ color: rgba(255,120,180,.8); }
-details.repro .repro-icon.baby       { border: 1.5px solid rgba(130,200,255,.4); }
-details.repro .repro-icon.baby i     { color: rgba(130,200,255,.8); }
-
-/* === Заголовок и бейдж === */
-details.repro .repro-title { font-weight: 600; font-size: 13px; }
-details.repro .repro-badge {
-  margin-left: auto; font-size: 10px; padding: 2px 8px;
-  border-radius: 50px; font-weight: 600;
-}
-details.repro .repro-badge.cycle     { border: 1px solid rgba(180,120,255,.3); color: rgba(180,120,255,.9); }
-details.repro .repro-badge.pregnancy { border: 1px solid rgba(255,120,180,.3); color: rgba(255,120,180,.9); }
-details.repro .repro-badge.baby      { border: 1px solid rgba(130,200,255,.3); color: rgba(130,200,255,.9); }
-
-/* === Шеврон === */
-details.repro .repro-chev {
-  width: 16px; height: 16px; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  transition: transform .25s;
-}
-details.repro .repro-chev i { font-size: 10px; color: rgba(255,255,255,.3); }
-details.repro[open] .repro-chev { transform: rotate(180deg); }
-
-/* === Тело карточки === */
 details.repro .repro-c {
-  padding: 12px 16px;
-  background: transparent;
-  border: 1.5px solid rgba(255,255,255,.18);
-  border-top: none;
-  border-radius: 0 0 14px 14px;
+  background: color-mix(in srgb, var(--SmartThemeBlurTintColor) 88%, var(--SmartThemeBodyColor) 12%);
 }
-
-/* === Прогресс-бар === */
-details.repro .repro-bar {
-  height: 3px; background: rgba(255,255,255,.08);
-  border-radius: 50px; overflow: hidden; margin-bottom: 10px;
-}
-details.repro .repro-bar-fill { height: 100%; border-radius: 50px; }
-details.repro .repro-bar-fill.cycle     { background: #b478ff; }
-details.repro .repro-bar-fill.pregnancy { background: #ff9eb4; }
-details.repro .repro-bar-fill.baby      { background: #82c8ff; }
-
-/* === Сетка статов === */
-details.repro .repro-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-
-/* === Карточка стата === */
-details.repro .repro-stat {
-  display: flex; align-items: center; gap: 8px; padding: 7px 10px;
-  background: transparent;
-  border: 1px solid rgba(255,255,255,.1);
-  border-radius: 10px;
-}
-details.repro .repro-wide { grid-column: 1 / -1; }
-
-/* === Иконки статов === */
-details.repro .rp-si {
-  width: 20px; height: 20px; border-radius: 6px;
-  display: flex; align-items: center; justify-content: center;
-}
-details.repro .rp-si i { font-size: 10px; }
-details.repro .rp-si.green  i { color: rgba(0,200,130,.7); }
-details.repro .rp-si.pink   i { color: rgba(255,100,150,.7); }
-details.repro .rp-si.purple i { color: rgba(180,120,255,.7); }
-details.repro .rp-si.blue   i { color: rgba(130,200,255,.7); }
-details.repro .rp-si.orange i { color: rgba(255,180,60,.7); }
-details.repro .rp-si.red    i { color: rgba(255,80,80,.7); }
-
-/* === Текст статов === */
-details.repro .rp-lbl { color: rgba(255,255,255,.35); font-size: 9px; }
-details.repro .rp-val { color: rgba(255,255,255,.85); font-size: 11px; font-weight: 600; }
-details.repro .rp-val-warn { color: rgba(255,170,0,.9) !important; }
-
-/* === Заметка === */
-details.repro .repro-note {
-  grid-column: 1 / -1; margin-top: 6px; padding: 8px 12px;
-  background: transparent;
-  border: 1px solid rgba(255,255,255,.1);
-  border-radius: 10px; font-size: 10px; color: rgba(255,255,255,.5);
-  line-height: 1.5; font-style: italic;
-}
-details.repro .repro-rec { font-style: normal; color: rgba(255,215,64,.6); }
-details.repro .repro-rec i { margin-right: 4px; opacity: .7; }
-
-/* === Бейдж здоровья === */
-details.repro .repro-health {
-  display: inline-flex; align-items: center; gap: 3px;
-  padding: 1px 6px; border-radius: 8px; font-size: 9px; font-weight: 600;
-}
-details.repro .repro-health.normal   { border: 1px solid rgba(0,200,100,.3);  color: rgba(0,200,100,.9); }
-details.repro .repro-health.warning  { border: 1px solid rgba(255,170,0,.3);  color: rgba(255,170,0,.9); }
-details.repro .repro-health.critical { border: 1px solid rgba(255,60,60,.3);  color: rgba(255,60,60,.9); }
-
-/* === Объединённая карточка (двое носителей) === */
-details.repro.repro-multi .repro-multi-body { padding: 8px 10px 10px; display: flex; flex-direction: column; gap: 6px; }
-/* Вложенные карточки носителей становятся секциями: без внешних рамок */
-details.repro.repro-multi details.repro { margin: 0; max-width: none; }
-details.repro.repro-multi details.repro .repro-header {
-  border: none; border-radius: 10px; padding: 6px 10px;
-  background: rgba(255,255,255,.03);
-}
-details.repro.repro-multi details.repro[open] .repro-header { border-radius: 10px 10px 0 0; }
-details.repro.repro-multi details.repro .repro-c { border: none; padding: 8px 4px 4px; }
-details.repro.repro-multi .repro-badge { font-size: 9px; }
-
-/* Подпись внутри стата (день цикла и т.п.) */
-details.repro .rp-sub { opacity: .5; font-weight: 400; font-size: 10px; }`;
+details.repro .repro-bar-fill {
+  background: var(--SmartThemeUnderlineColor);
+}`;
 
 // ── Custom CSS for infoblock ──
 // Пользовательский CSS должен побеждать тему, а у темы селекторы вида
@@ -414,7 +288,7 @@ export function buildInfoblockHtml() {
                 <summary><div class="repro-header">
                     <div class="repro-icon baby">${ic('fa-baby')}</div>
                     <span class="repro-title repro-baby-name" data-baby-idx="${i}" title="Клик для переименования" style="cursor:pointer">${label}</span>
-                    <span class="repro-badge baby" style="color:var(--rp-${sexColor})">${sexIcon} · ${ageStr}${(() => { const st = getGrowthStage(ageDays); return (st && st.key !== 'newborn') ? ' · ' + st.label : ''; })()}</span>
+                    <span class="repro-badge baby rp-theme-colour">${sexIcon} · ${ageStr}${(() => { const st = getGrowthStage(ageDays); return (st && st.key !== 'newborn') ? ' · ' + st.label : ''; })()}</span>
                     <div class="repro-chev">${ic('fa-chevron-down')}</div>
                 </div></summary>
                 <div class="repro-c"><div class="repro-grid">
@@ -428,7 +302,7 @@ export function buildInfoblockHtml() {
                     ${baby.fatherName ? stat('fa-user', 'blue', 'Второй родитель', escapeLabel(baby.fatherName)) : ''}
                     ${baby.personality?.length ? `<div class="repro-note"><i class="fa-solid fa-brain" style="margin-right:4px;opacity:0.5"></i>${baby.personality.join(', ')}</div>` : ''}
                     ${baby.appearance?.length ? `<div class="repro-note"><i class="fa-solid fa-eye" style="margin-right:4px;opacity:0.5"></i>${baby.appearance.join(', ')}</div>` : ''}
-                    ${baby.special ? `<div class="repro-note" style="border-color:rgba(255,215,64,.35);background:rgba(255,215,64,.06)"><i class="fa-solid fa-star" style="margin-right:4px;color:#ffd740"></i><b>${baby.special.name || baby.special}</b>${baby.special.desc ? ` — ${baby.special.desc}` : ''}</div>` : ''}
+                    ${baby.special ? `<div class="repro-note rp-special-note"><i class="fa-solid fa-star" style="margin-right:4px"></i><b>${baby.special.name || baby.special}</b>${baby.special.desc ? ` — ${baby.special.desc}` : ''}</div>` : ''}
                     ${milestones ? `<div class="repro-note"><i class="fa-solid fa-star" style="margin-right:4px;opacity:0.5"></i>${milestones}</div>` : ''}
                     ${careRec ? `<div class="repro-note repro-rec"><i class="fa-solid fa-lightbulb" style="margin-right:4px;opacity:0.7"></i>${careRec}</div>` : ''}
                 </div></div>
@@ -1065,7 +939,7 @@ export function showQuickBar() {
         setTimeout(() => { updatePromptInjection(); syncUI(); }, 30);
         // Обновляем строку статуса
         const ph = getPhaseInfo(v);
-        overlay.find('.rp-quick-status').html(`Цикл: день ${v}/${cycleLength(getSettings())} · <span style="color:${ph.color}">${ph.name}</span>`);
+        overlay.find('.rp-quick-status').html(`Цикл: день ${v}/${cycleLength(getSettings())} · <span class="rp-phase-label">${ph.name}</span>`);
         showNotification(`День цикла: ${v}`, 'success');
     };
     overlay.find('.rp-quick-step').on('click', function() {
@@ -1178,7 +1052,7 @@ export function syncUI() {
     const partnerInfo = el('repro-partner-cycle-info');
     if (partnerInfo) {
         partnerInfo.textContent = cycleSummary('char', getPartnerData(), s);
-        partnerInfo.style.color = getPartnerData().isPregnant ? 'var(--rp-pink)' : getPhaseInfo(partnerDay, 'ru', 'char').color;
+        partnerInfo.style.color = 'var(--rp-text)';
     }
 
     const babyMaxAge = el('repro-baby-max-age');
@@ -1209,14 +1083,14 @@ export function syncUI() {
     if (cycleInfo) {
         const ph = getPhaseInfo(_cd);
         cycleInfo.textContent = cycleSummary('user', p, s);
-        cycleInfo.style.color = p.isPregnant ? 'var(--rp-pink)' : ph.color;
+        cycleInfo.style.color = 'var(--rp-text)';
     }
 
     const status = el('repro-status');
     if (status) {
         if(care(p).maternalDeath || care(p).event)status.textContent=cycleSummary('user',p,s);
-        else if (p.isPregnant) status.innerHTML = `<span style="color:var(--rp-pink)">Беременна</span>`;
-        else if (p.hasBaby) status.innerHTML = `<span style="color:var(--rp-blue)">Малыш</span>`;
+        else if (p.isPregnant) status.innerHTML = `<span class="rp-theme-colour">Беременна</span>`;
+        else if (p.hasBaby) status.innerHTML = `<span class="rp-theme-colour">Малыш</span>`;
         else status.innerHTML = `<span style="opacity:0.5">Нет</span>`;
     }
 
@@ -1281,7 +1155,7 @@ export function syncUI() {
                     <span style="font-size:9px;opacity:0.5">нед.</span>
                     <button id="repro-apply-weeks" class="rp-m-btn" style="flex:1">Установить</button>
                 </div>
-                <button id="repro-reanchor-btn" class="rp-m-btn" style="margin-top:6px;background:rgba(255,255,255,0.05)">Пересчитать недели от RP-даты</button>`;
+                <button id="repro-reanchor-btn" class="rp-m-btn" style="margin-top:6px">Пересчитать недели от RP-даты</button>`;
 
             setTimeout(() => {
                 const db = el('repro-doctor-btn'); if (db) db.onclick = visitDoctor;
@@ -1359,7 +1233,7 @@ export function syncUI() {
                 </div>
                 <div style="display:flex;gap:4px;margin-top:6px">
                     <button id="repro-partner-birth" class="rp-m-btn" style="flex:1">Принять роды</button>
-                    <button id="repro-partner-reset" class="rp-m-btn" style="flex:1;background:rgba(255,80,80,0.12)">Сброс</button>
+                    <button id="repro-partner-reset" class="rp-m-btn" style="flex:1">Сброс</button>
                 </div>`;
             setTimeout(() => {
                 const bb = el('repro-partner-birth');
@@ -1417,7 +1291,7 @@ export function syncUI() {
                     <div class="rp-m-cell"><span class="rp-m-lbl">Настроение</span><span class="rp-m-val">${baby.mood || '—'}</span></div>
                     <div class="rp-m-cell"><span class="rp-m-lbl">Сон</span><span class="rp-m-val">${baby.sleep || '—'}</span></div>
                     <div class="rp-m-cell"><span class="rp-m-lbl">Кормление</span><span class="rp-m-val">${baby.feedingType || '—'}</span></div>
-                    <div class="rp-m-cell"><span class="rp-m-lbl">Подгузник</span><span class="rp-m-val" style="color:${baby.diaperClean !== false ? 'var(--rp-green)' : 'var(--rp-yellow)'}">${baby.diaperClean !== false ? 'Чистый' : 'Смена!'}</span></div>
+                    <div class="rp-m-cell"><span class="rp-m-lbl">Подгузник</span><span class="rp-m-val rp-theme-colour">${baby.diaperClean !== false ? 'Чистый' : 'Смена!'}</span></div>
                     ${baby.fatherName ? `<div class="rp-m-cell"><span class="rp-m-lbl">Второй родитель</span><span class="rp-m-val">${escapeLabel(baby.fatherName)}</span></div>` : ''}
                 </div>`;
             });
@@ -1519,8 +1393,8 @@ export function setupUI() {
             <div id="repro-preg-mon" class="rp-m" style="display:none"></div>
             <div id="repro-partner-mon" class="rp-m" style="display:none"></div>
             <div id="repro-baby-mon" class="rp-m" style="display:none"></div>
-            <button id="repro-family-tree-btn" class="menu_button" style="width:100%"><i class="fa-solid fa-people-roof" style="margin-right:6px;color:rgba(130,200,255,.8)"></i>Семейное древо</button>
-            <button id="repro-force-birth-btn" class="menu_button" style="width:100%;display:none"><i class="fa-solid fa-baby" style="margin-right:6px;color:rgba(255,120,180,.8)"></i>Принять роды сейчас</button>
+            <button id="repro-family-tree-btn" class="menu_button" style="width:100%"><i class="fa-solid fa-people-roof" style="margin-right:6px"></i>Семейное древо</button>
+            <button id="repro-force-birth-btn" class="menu_button" style="width:100%;display:none"><i class="fa-solid fa-baby" style="margin-right:6px"></i>Принять роды сейчас</button>
             <hr>
             <div style="display:flex;gap:4px;align-items:stretch">
                 <div id="repro-manual-toggle" class="menu_button" style="flex:1;font-size:10px;text-align:center;cursor:pointer">Ручная беременность / малыш ▼</div>

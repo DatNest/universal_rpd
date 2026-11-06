@@ -13,72 +13,7 @@ export function initCustomNotifications() {
 
     $('body').append('<div id="custom-notification-container"></div>');
 
-    $('head').append(`<style id="repro-notifications-style">
-#custom-notification-container {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 999999;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    pointer-events: none;
-}
-.custom-notification {
-    min-width: 300px;
-    max-width: 500px;
-    padding: 16px 22px;
-    border-radius: 15px;
-    font-size: 14px;
-    font-weight: 600;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    animation: slideIn 0.3s ease-out;
-    pointer-events: all;
-    position: relative;
-    cursor: pointer;
-}
-.custom-notification.success {
-    background: rgba(0, 255, 136, 0.15);
-    border: 1px solid rgba(0, 255, 136, 0.3);
-    color: #00ff88;
-    box-shadow: 0 8px 32px rgba(0, 255, 136, 0.2);
-}
-.custom-notification.warning {
-    background: rgba(255, 170, 0, 0.15);
-    border: 1px solid rgba(255, 170, 0, 0.3);
-    color: #ffaa00;
-    box-shadow: 0 8px 32px rgba(255, 170, 0, 0.2);
-}
-.custom-notification.info {
-    background: rgba(74, 158, 255, 0.15);
-    border: 1px solid rgba(74, 158, 255, 0.3);
-    color: #4a9eff;
-    box-shadow: 0 8px 32px rgba(74, 158, 255, 0.2);
-}
-.custom-notification .close-btn {
-    position: absolute;
-    top: 10px;
-    right: 12px;
-    background: none;
-    border: none;
-    color: inherit;
-    font-size: 18px;
-    cursor: pointer;
-    opacity: 0.7;
-    line-height: 1;
-}
-.custom-notification .close-btn:hover { opacity: 1; }
-.custom-notification i.fa-solid { margin-right: 6px; font-size: 15px; vertical-align: middle; }
-@keyframes slideIn {
-    from { transform: translateY(-100%); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-}
-@keyframes slideOut {
-    to { transform: translateY(-100%); opacity: 0; }
-}
-</style>`);
+    // Visual rules are maintained in the single extension style.css.
 }
 
 export function showNotification(message, type = 'info') {
@@ -264,99 +199,10 @@ export function showGraduationDialog(graduates, onConfirm) {
         return;
     }
 
-    // Стили для диалога + конфетти (вставляем один раз)
-    if ($('#repro-graduation-style').length === 0) {
-        $('head').append(`<style id="repro-graduation-style">
-.rg-overlay {
-    position: fixed; inset: 0; z-index: 1000000;
-    background: rgba(0, 0, 0, 0.55);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    display: flex; align-items: center; justify-content: center;
-    animation: rgFadeIn .3s ease-out;
-}
-@keyframes rgFadeIn { from { opacity: 0; } to { opacity: 1; } }
-.rg-card {
-    position: relative;
-    background: linear-gradient(145deg, rgba(255, 158, 200, 0.18), rgba(180, 120, 255, 0.18));
-    backdrop-filter: blur(28px) saturate(180%);
-    -webkit-backdrop-filter: blur(28px) saturate(180%);
-    border: 1.5px solid rgba(255, 255, 255, 0.25);
-    border-radius: 24px;
-    padding: 32px 36px;
-    min-width: 340px; max-width: 480px;
-    box-shadow: 0 20px 60px rgba(255, 120, 180, 0.25);
-    text-align: center;
-    color: rgba(255, 255, 255, 0.95);
-    animation: rgPop .45s cubic-bezier(.34,1.56,.64,1);
-    overflow: hidden;
-}
-@keyframes rgPop { from { transform: scale(.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-.rg-icon {
-    font-size: 48px; margin-bottom: 12px;
-    background: linear-gradient(135deg, #ff9eb4, #b478ff);
-    -webkit-background-clip: text; background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 2px 8px rgba(255, 158, 200, 0.4));
-}
-.rg-title {
-    font-size: 22px; font-weight: 700;
-    margin-bottom: 8px;
-    background: linear-gradient(135deg, #ff9eb4 0%, #b478ff 100%);
-    -webkit-background-clip: text; background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-.rg-subtitle {
-    font-size: 13px; opacity: 0.75;
-    margin-bottom: 18px; line-height: 1.5;
-}
-.rg-names {
-    font-size: 16px; font-weight: 600;
-    color: rgba(255, 255, 255, 0.92);
-    margin-bottom: 22px;
-    padding: 12px 16px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 14px;
-}
-.rg-names .rg-sex-icon {
-    display: inline-block;
-    margin-right: 4px;
-    opacity: 0.8;
-}
-.rg-btn {
-    background: linear-gradient(135deg, rgba(255, 158, 200, 0.3), rgba(180, 120, 255, 0.3));
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    color: rgba(255, 255, 255, 0.95);
-    padding: 10px 28px;
-    border-radius: 50px;
-    font-size: 13px; font-weight: 600;
-    cursor: pointer;
-    transition: all .2s;
-}
-.rg-btn:hover {
-    background: linear-gradient(135deg, rgba(255, 158, 200, 0.5), rgba(180, 120, 255, 0.5));
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(255, 120, 180, 0.3);
-}
-/* Конфетти */
-.rg-confetti {
-    position: absolute;
-    width: 8px; height: 14px;
-    top: -20px;
-    border-radius: 2px;
-    animation: rgConfettiFall linear forwards;
-    pointer-events: none;
-}
-@keyframes rgConfettiFall {
-    0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
-    100% { transform: translateY(520px) rotate(720deg); opacity: 0; }
-}
-</style>`);
-    }
+    // The graduation dialog and confetti use the shared theme-native style.css.
 
-    const sexIcon = (s) => s === 'M' ? '<span class="rg-sex-icon" style="color:#4dabf7">♂</span>'
-                       : s === 'F' ? '<span class="rg-sex-icon" style="color:#ff9ff3">♀</span>'
+    const sexIcon = (s) => s === 'M' ? '<span class="rg-sex-icon rp-theme-colour">♂</span>'
+                       : s === 'F' ? '<span class="rg-sex-icon rp-theme-colour">♀</span>'
                        : '';
     const namesHtml = graduates.map(b => `${sexIcon(b.sex)}${escapeHtml(b.name || 'малыш')}`).join(', ');
 
@@ -381,13 +227,11 @@ export function showGraduationDialog(graduates, onConfirm) {
     card.focus();
 
     // Запускаем конфетти
-    const colors = ['#ff9eb4', '#b478ff', '#82c8ff', '#ffd64a', '#82e878', '#ff7fbf'];
     const cardEl = card[0];
     for (let i = 0; i < 60; i++) {
         const conf = document.createElement('div');
         conf.className = 'rg-confetti';
         conf.style.left = Math.random() * 100 + '%';
-        conf.style.background = colors[Math.floor(Math.random() * colors.length)];
         conf.style.animationDuration = (1.5 + Math.random() * 2) + 's';
         conf.style.animationDelay = (Math.random() * 0.5) + 's';
         cardEl.appendChild(conf);

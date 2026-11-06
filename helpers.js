@@ -97,11 +97,11 @@ export function roll(max = 100) {
 
 export function getPhaseInfo(day, lang = 'ru', heat = false, menstruation = true) {
     const L = lang === 'en';
-    if (day > 28) return { name: L ? 'Delayed period' : 'Задержка', icon: 'fa-clock', color: '#ffd43b' };
-    if (day <= 5 && menstruation) return { name: L ? 'Menstruation' : 'Менструация', icon: 'fa-droplet', color: '#ff4444' };
-    if (day <= 11) return { name: L ? 'Follicular' : 'Фолликулярная', icon: 'fa-seedling', color: '#66bb6a' };
-    if (day <= 16) return { name: L ? (heat ? 'Ovulation / heat' : 'Ovulation') : (heat ? 'Овуляция / течка' : 'Овуляция'), icon: 'fa-fire', color: '#ff6b6b' };
-    return { name: L ? 'Luteal' : 'Лютеиновая', icon: 'fa-moon', color: '#ffd43b' };
+    if (day > 28) return { name: L ? 'Delayed period' : 'Задержка', icon: 'fa-clock', color: 'var(--rp-attention)' };
+    if (day <= 5 && menstruation) return { name: L ? 'Menstruation' : 'Менструация', icon: 'fa-droplet', color: 'var(--rp-attention)' };
+    if (day <= 11) return { name: L ? 'Follicular' : 'Фолликулярная', icon: 'fa-seedling', color: 'var(--rp-accent)' };
+    if (day <= 16) return { name: L ? (heat ? 'Ovulation / heat' : 'Ovulation') : (heat ? 'Овуляция / течка' : 'Овуляция'), icon: 'fa-fire', color: 'var(--rp-attention)' };
+    return { name: L ? 'Luteal' : 'Лютеиновая', icon: 'fa-moon', color: 'var(--rp-attention)' };
 }
 
 // Множитель шанса зачатия по дню цикла. Раньше «прочие дни» стоили 0.25 —
@@ -203,8 +203,8 @@ export function getRecommendationsForProgress(progressPercent, lang = 'ru') {
 export function formatSexIcons(fetusSex, withText = false) {
     if (!fetusSex || fetusSex.length === 0) return '';
     return fetusSex.map(sex => {
-        if (withText) return sex === 'M' ? '<i class="fa-solid fa-mars" style="color:#4dabf7"></i> мальчик' : '<i class="fa-solid fa-venus" style="color:#ff9ff3"></i> девочка';
-        return sex === 'M' ? '<i class="fa-solid fa-mars" style="color:#4dabf7"></i>' : '<i class="fa-solid fa-venus" style="color:#ff9ff3"></i>';
+        if (withText) return sex === 'M' ? '<i class="fa-solid fa-mars rp-theme-colour"></i> мальчик' : '<i class="fa-solid fa-venus rp-theme-colour"></i> девочка';
+        return sex === 'M' ? '<i class="fa-solid fa-mars rp-theme-colour"></i>' : '<i class="fa-solid fa-venus rp-theme-colour"></i>';
     }).join(withText ? ', ' : ' ');
 }
 
@@ -227,9 +227,9 @@ export function formatFetusCount(count, style = 'short', lang = 'ru') {
 
 export function getHealthInfo(healthStatus, lang = 'ru') {
     const L = lang === 'en';
-    if (healthStatus === 'warning') return { text: L ? 'Needs attention' : 'Требует внимания', icon: 'fa-triangle-exclamation', color: '#ffaa00' };
-    if (healthStatus === 'critical') return { text: L ? 'CRITICAL' : 'КРИТИЧЕСКОЕ', icon: 'fa-circle-exclamation', color: '#ff4444' };
-    return { text: L ? 'Normal' : 'Норма', icon: 'fa-circle-check', color: '#00e676' };
+    if (healthStatus === 'warning') return { text: L ? 'Needs attention' : 'Требует внимания', icon: 'fa-triangle-exclamation', color: 'var(--rp-attention)' };
+    if (healthStatus === 'critical') return { text: L ? 'CRITICAL' : 'КРИТИЧЕСКОЕ', icon: 'fa-circle-exclamation', color: 'var(--rp-attention)' };
+    return { text: L ? 'Normal' : 'Норма', icon: 'fa-circle-check', color: 'var(--rp-accent)' };
 }
 
 // ─── Complication definitions (one-time roll at conception) ───
