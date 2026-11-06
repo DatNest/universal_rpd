@@ -1043,7 +1043,7 @@ export function syncUI() {
     const cycInfo = el('repro-currentcycle');
     const cycRow = el('repro-cycle-row');
     if (cycInfo) cycInfo.style.display = isTracked('user') ? '' : 'none';
-    if (cycRow) cycRow.style.display = isTracked('user') && hasCycle(s, 'user') ? 'flex' : 'none';
+    if (cycRow) cycRow.style.display = isTracked('user') && hasCycle(s, 'user') ? 'grid' : 'none';
     const partnerRow = el('repro-partner-cycle-row');
     if (partnerRow) partnerRow.style.display = isTracked('char') && hasCycle(s, 'char') ? '' : 'none';
     const partnerDay = getPartnerData().cycleDay || 1;
@@ -1231,9 +1231,9 @@ export function syncUI() {
                     <div class="rp-m-cell"><span class="rp-m-lbl">Плод</span><span class="rp-m-val">${formatFetusCount(c.fetusCount)} (${sexStr})</span></div>
                     ${c.fatherName ? `<div class="rp-m-cell"><span class="rp-m-lbl">Второй родитель</span><span class="rp-m-val">${escapeLabel(c.fatherName)}</span></div>` : ''}
                 </div>
-                <div style="display:flex;gap:4px;margin-top:6px">
-                    <button id="repro-partner-birth" class="rp-m-btn" style="flex:1">Принять роды</button>
-                    <button id="repro-partner-reset" class="rp-m-btn" style="flex:1">Сброс</button>
+                <div class="rp-m-action-row">
+                    <button id="repro-partner-birth" class="rp-m-btn">Принять роды</button>
+                    <button id="repro-partner-reset" class="rp-m-btn">Сброс</button>
                 </div>`;
             setTimeout(() => {
                 const bb = el('repro-partner-birth');
@@ -1255,7 +1255,7 @@ export function syncUI() {
 
     // Строка выбора носителя в ручной панели — только когда отслеживаются оба
     const manualWhoRow = el('repro-manual-who-row');
-    if (manualWhoRow) manualWhoRow.style.display = (s.trackFor === 'both') ? 'flex' : 'none';
+    if (manualWhoRow) manualWhoRow.style.display = (s.trackFor === 'both') ? 'grid' : 'none';
     const manualWhoSel = el('repro-manual-who');
     if (manualWhoSel && s.trackFor !== 'both') manualWhoSel.value = (s.trackFor === 'char') ? 'char' : 'user';
 
@@ -1321,14 +1321,18 @@ export function setupUI() {
         <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
     </div>
     <div class="inline-drawer-content">
-        <div class="reproductive-system-settings">
+        <div class="reproductive-system-settings" data-rp-tab="state">
+            <nav class="rp-nav" aria-label="Разделы репродуктивной системы">
+                <button type="button" class="rp-tab is-active" data-rp-view="state" aria-pressed="true"><i class="fa-solid fa-heart-pulse" aria-hidden="true"></i> Состояние</button>
+                <button type="button" class="rp-tab" data-rp-view="settings" aria-pressed="false"><i class="fa-solid fa-sliders" aria-hidden="true"></i> Настройки</button>
+                <button type="button" class="rp-tab" data-rp-view="tools" aria-pressed="false"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> Действия</button>
+            </nav>
             <div class="rp-dashboard-shell">
                 <div class="rp-main-grid">
                     <section class="rp-card rp-card-controls" aria-label="Настройки отслеживания">
                         <div class="rp-card-head">
-                            <p class="rp-card-kicker">Управление</p>
-                            <h3>Отслеживание и условия</h3>
-                            <p class="rp-card-copy">Все функции и данные прежние — меняется только вид панели.</p>
+                            <p class="rp-card-kicker">ПАРАМЕТРЫ</p>
+                            <h3>Отслеживание</h3>
                         </div>
 
                         <div class="rp-switch-stack">
@@ -1412,8 +1416,7 @@ export function setupUI() {
 
                     <section class="rp-card rp-card-status" aria-label="Текущее состояние">
                         <div class="rp-card-head rp-card-head-compact">
-                            <p class="rp-card-kicker">Сцена</p>
-                            <h3>Текущее состояние</h3>
+                            <p class="rp-card-kicker">ТЕКУЩАЯ СЦЕНА</p>
                         </div>
 
                         <div id="repro-currentcycle" class="rp-cycle-banner"></div>
@@ -1438,8 +1441,7 @@ export function setupUI() {
 
                 <section class="rp-card rp-card-actions">
                     <div class="rp-card-head rp-card-head-compact">
-                        <p class="rp-card-kicker">Инструменты</p>
-                        <h3>Быстрые действия</h3>
+                        <p class="rp-card-kicker">УПРАВЛЕНИЕ СЮЖЕТОМ</p>
                     </div>
 
                     <div class="rp-primary-actions">
@@ -1557,6 +1559,17 @@ details.repro { ... }"></textarea>
     </div>
 </div>`;
         $('#extensions_settings2').append(html);
+        // Presentation-only tabs. Existing control IDs, values and event handlers are unchanged.
+        const $dashboard = $('#extensions_settings2 .reproductive-system-settings').last();
+        $dashboard.find('.rp-tab').on('click', function () {
+            const view = this.dataset.rpView;
+            $dashboard.attr('data-rp-tab', view);
+            $dashboard.find('.rp-tab').each(function () {
+                const active = this.dataset.rpView === view;
+                this.classList.toggle('is-active', active);
+                this.setAttribute('aria-pressed', String(active));
+            });
+        });
         $('#rp-open-profiles').on('click',()=>openReproductiveSettings());
 
         // ── Пункт в «волшебной палочке» ST (меню расширений у поля ввода) ──
