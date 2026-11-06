@@ -1,81 +1,78 @@
-/* Reproductive System — custom dashboard skin, built from the active SillyTavern theme.
-   Every painted colour below is a host-theme token or a mixture of host-theme tokens.
-   No independent palette, gradients, glows or whole-application overrides. */
+
+/* Reproductive System — full visual rewrite.
+   All colours inherit from the active Tavern theme.
+   Functions, IDs and logic remain intact; only presentation is redesigned. */
 :root {
     --rp-reading-size: 16px;
+    --rp-font: inherit;
     --rp-text: var(--SmartThemeBodyColor);
-    --rp-surface: var(--SmartThemeBlurTintColor);
-    --rp-paper: color-mix(in srgb, var(--SmartThemeBlurTintColor) 90%, var(--SmartThemeBodyColor) 10%);
-    --rp-input: color-mix(in srgb, var(--SmartThemeBlurTintColor) 94%, var(--SmartThemeBodyColor) 6%);
-    --rp-border: color-mix(in srgb, var(--SmartThemeBorderColor) 56%, var(--SmartThemeBodyColor) 44%);
-    --rp-quiet-border: color-mix(in srgb, var(--SmartThemeBorderColor) 34%, var(--SmartThemeBlurTintColor) 66%);
-    --rp-accent: var(--customThemeColor, var(--SmartThemeEmColor, var(--SmartThemeUnderlineColor)));
-    --rp-attention: var(--SmartThemeQuoteColor, var(--SmartThemeEmColor));
-    --rp-accent-surface: color-mix(in srgb, var(--SmartThemeBlurTintColor) 79%, var(--rp-accent) 21%);
-    --rp-hover: color-mix(in srgb, var(--SmartThemeBlurTintColor) 72%, var(--rp-accent) 28%);
-    --rp-status-surface: color-mix(in srgb, var(--SmartThemeBlurTintColor) 86%, var(--rp-attention) 14%);
-    --rp-screen: color-mix(in srgb, var(--SmartThemeBlurTintColor) 90%, transparent);
-}
-/* Historical light-mode setting remains usable but never substitutes another palette. */
-body[data-rp-light] {
-    --rp-paper: color-mix(in srgb, var(--SmartThemeBlurTintColor) 85%, var(--SmartThemeBodyColor) 15%);
+    --rp-text-soft: color-mix(in srgb, var(--SmartThemeBodyColor) 72%, transparent);
+    --rp-text-faint: color-mix(in srgb, var(--SmartThemeBodyColor) 54%, transparent);
+    --rp-surface: color-mix(in srgb, var(--SmartThemeBlurTintColor) 94%, var(--SmartThemeBodyColor) 6%);
+    --rp-surface-2: color-mix(in srgb, var(--SmartThemeBlurTintColor) 88%, var(--SmartThemeBodyColor) 12%);
+    --rp-surface-3: color-mix(in srgb, var(--SmartThemeBlurTintColor) 82%, var(--SmartThemeBodyColor) 18%);
     --rp-input: color-mix(in srgb, var(--SmartThemeBlurTintColor) 91%, var(--SmartThemeBodyColor) 9%);
+    --rp-border: color-mix(in srgb, var(--SmartThemeBorderColor) 58%, var(--SmartThemeBodyColor) 42%);
+    --rp-border-soft: color-mix(in srgb, var(--SmartThemeBorderColor) 34%, var(--SmartThemeBlurTintColor) 66%);
+    --rp-accent: var(--customThemeColor, var(--SmartThemeEmColor, var(--SmartThemeUnderlineColor)));
+    --rp-accent-soft: color-mix(in srgb, var(--rp-accent) 22%, var(--rp-surface) 78%);
+    --rp-accent-strong: color-mix(in srgb, var(--rp-accent) 40%, var(--rp-surface) 60%);
+    --rp-attention: var(--SmartThemeQuoteColor, var(--SmartThemeEmColor, var(--rp-accent)));
+    --rp-danger: color-mix(in srgb, var(--rp-attention) 65%, var(--rp-accent) 35%);
+    --rp-radius-xl: 22px;
+    --rp-radius-lg: 18px;
+    --rp-radius-md: 14px;
+    --rp-radius-sm: 11px;
+    --rp-shadow: none;
+    --rp-screen: color-mix(in srgb, var(--SmartThemeBlurTintColor) 92%, transparent);
+}
+body[data-rp-light] {
+    --rp-surface: color-mix(in srgb, var(--SmartThemeBlurTintColor) 86%, var(--SmartThemeBodyColor) 14%);
+    --rp-surface-2: color-mix(in srgb, var(--SmartThemeBlurTintColor) 80%, var(--SmartThemeBodyColor) 20%);
+    --rp-surface-3: color-mix(in srgb, var(--SmartThemeBlurTintColor) 74%, var(--SmartThemeBodyColor) 26%);
+    --rp-input: color-mix(in srgb, var(--SmartThemeBlurTintColor) 88%, var(--SmartThemeBodyColor) 12%);
 }
 
-/* Scoped baseline: the user's global theme must not change the dashboard's geometry. */
 :is(.reproductive-system-settings, .rp-profile-dialog, details.repro, #repro-birth-overlay,
     #rp-tree-overlay, #rp-quick-overlay, #rp-theme-overlay, .custom-notification, .rg-overlay) {
     color: var(--rp-text);
-    font-family: inherit;
-    font-size: max(16px, var(--rp-reading-size)) !important;
-    font-style: normal !important;
-    font-weight: 400;
-    line-height: 1.55 !important;
-    letter-spacing: .008em;
-    word-spacing: .025em;
+    font-family: var(--rp-font);
+    font-size: max(16px, var(--rp-reading-size));
+    line-height: 1.5;
     text-shadow: none !important;
+    letter-spacing: .006em;
 }
 :is(.reproductive-system-settings, .rp-profile-dialog, details.repro, #repro-birth-overlay,
     #rp-tree-overlay, #rp-quick-overlay, #rp-theme-overlay, .custom-notification, .rg-overlay),
 :is(.reproductive-system-settings, .rp-profile-dialog, details.repro, #repro-birth-overlay,
     #rp-tree-overlay, #rp-quick-overlay, #rp-theme-overlay, .custom-notification, .rg-overlay) * {
     box-sizing: border-box;
+    font-style: normal !important;
     background-image: none !important;
     text-shadow: none !important;
-    font-style: normal !important;
 }
-:is(.reproductive-system-settings, .rp-profile-dialog, details.repro, .rb-dialog,
-    .rp-tree-dialog, .rp-quick-dialog, .rp-th-dialog, .rg-card) :is(small, span, label, p, li, div, b, strong) {
-    line-height: 1.55;
-}
-:is(.reproductive-system-settings, .rp-profile-dialog, details.repro, .rb-dialog,
-    .rp-tree-dialog, .rp-quick-dialog, .rp-th-dialog, .rg-card) :is(small, span, label, p) { opacity: 1 !important; }
 :is(.reproductive-system-settings, .rp-profile-dialog, .rb-dialog,
     .rp-tree-dialog, .rp-quick-dialog, .rp-th-dialog, .rg-card) :is(button, input, select, textarea, .menu_button) {
     font-family: inherit !important;
     font-size: max(16px, var(--rp-reading-size)) !important;
-    line-height: 1.4 !important;
+    line-height: 1.35 !important;
     color: var(--rp-text) !important;
     background: var(--rp-input) !important;
-    border: 1px solid var(--rp-quiet-border) !important;
-    border-radius: 10px !important;
-    min-height: 44px;
-    max-width: 100%;
-    padding: 9px 12px;
+    border: 1px solid var(--rp-border-soft) !important;
+    border-radius: var(--rp-radius-sm) !important;
+    min-height: 46px;
+    padding: 10px 14px;
     box-shadow: none !important;
     filter: none !important;
 }
 :is(.reproductive-system-settings, .rp-profile-dialog, .rb-dialog,
-    .rp-tree-dialog, .rp-quick-dialog, .rp-th-dialog, .rg-card) :is(button, .menu_button, summary, [role="button"]) { cursor: pointer; }
-:is(.reproductive-system-settings, .rp-profile-dialog, .rb-dialog,
-    .rp-tree-dialog, .rp-quick-dialog, .rp-th-dialog, .rg-card) :is(button, .menu_button):hover:not(:disabled) {
-    background: var(--rp-hover) !important;
-    border-color: var(--rp-accent) !important;
+    .rp-tree-dialog, .rp-quick-dialog, .rp-th-dialog, .rg-card) :is(button, .menu_button, [role="button"], summary) {
+    cursor: pointer;
 }
 :is(.reproductive-system-settings, .rp-profile-dialog, .rb-dialog,
-    .rp-tree-dialog, .rp-quick-dialog, .rp-th-dialog, .rg-card) :is(button, input, select, textarea):disabled {
-    cursor: default;
-    border-style: dashed !important;
+    .rp-tree-dialog, .rp-quick-dialog, .rp-th-dialog, .rg-card) :is(button, .menu_button):hover:not(:disabled) {
+    background: var(--rp-surface-3) !important;
+    border-color: var(--rp-accent) !important;
 }
 :is(.reproductive-system-settings, .rp-profile-dialog, details.repro, #repro-birth-overlay,
     #rp-tree-overlay, #rp-quick-overlay, #rp-theme-overlay, .rg-overlay) :focus-visible {
@@ -83,411 +80,690 @@ body[data-rp-light] {
     outline-offset: 2px;
 }
 :is(.reproductive-system-settings, .rp-profile-dialog, .rb-dialog) :is(input[type="checkbox"], input[type="radio"]) {
-    flex-shrink: 0;
     accent-color: var(--rp-accent);
 }
 :is(.reproductive-system-settings, .rp-profile-dialog, .rb-dialog) :is(input, select, textarea)::placeholder {
-    color: var(--rp-text);
+    color: var(--rp-text-soft);
     opacity: 1;
 }
-:is(.reproductive-system-settings, .rp-profile-dialog, .rb-dialog, .rg-card) :is(hr, fieldset) { border-color: var(--rp-quiet-border); }
 
-/* Native extension accordion header — targeted, never restyle other extensions. */
+/* Drawer header */
 #extensions_settings2 .inline-drawer:has(> .inline-drawer-content > .reproductive-system-settings) > .inline-drawer-toggle.inline-drawer-header {
-    min-height: 48px;
-    padding: 10px 14px !important;
-    margin: 0 0 8px !important;
-    background: var(--rp-accent-surface) !important;
-    border: 1px solid var(--rp-quiet-border) !important;
-    border-radius: 12px !important;
+    min-height: 54px;
+    padding: 12px 16px !important;
+    margin: 0 0 10px !important;
+    border: 1px solid var(--rp-border-soft) !important;
+    border-radius: var(--rp-radius-md) !important;
+    background: color-mix(in srgb, var(--rp-surface) 72%, var(--rp-accent) 28%) !important;
     color: var(--rp-text) !important;
     box-shadow: none !important;
 }
-#extensions_settings2 .inline-drawer:has(> .inline-drawer-content > .reproductive-system-settings) > .inline-drawer-toggle.inline-drawer-header::before { display: none !important; }
-#extensions_settings2 .inline-drawer:has(> .inline-drawer-content > .reproductive-system-settings) > .inline-drawer-toggle.inline-drawer-header > b {
-    flex: 1; font-size: max(18px, var(--rp-reading-size)) !important; font-weight: 700;
+#extensions_settings2 .inline-drawer:has(> .inline-drawer-content > .reproductive-system-settings) > .inline-drawer-toggle.inline-drawer-header::before {
+    display: none !important;
 }
-#extensions_settings2 .inline-drawer:has(> .inline-drawer-content > .reproductive-system-settings) .rp-header-symbol {
-    display: grid; place-items: center; flex: 0 0 30px; width: 30px; height: 30px;
-    margin-right: 12px; border: 1px solid var(--rp-border); border-radius: 50%;
-    color: var(--rp-accent) !important; font-size: 18px !important;
+#extensions_settings2 .inline-drawer:has(> .inline-drawer-content > .reproductive-system-settings) > .inline-drawer-toggle.inline-drawer-header > b {
+    flex: 1;
+    font-size: max(20px, calc(var(--rp-reading-size) + 2px)) !important;
+    font-weight: 700;
+}
+#extensions_settings2 .reproductive-system-settings .rp-header-symbol {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    margin-right: 12px;
+    border: 1px solid var(--rp-border);
+    border-radius: 999px;
+    color: var(--rp-accent);
+    font-size: 18px !important;
+    flex: 0 0 34px;
 }
 
-/* MAIN DASHBOARD — the existing HTML is regrouped, not duplicated. */
+/* Main dashboard shell */
 #extensions_settings2 .reproductive-system-settings {
-    display: flex;
-    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent !important;
+    color: var(--rp-text) !important;
+    container-type: inline-size;
+}
+.reproductive-system-settings .rp-dashboard-shell {
+    display: grid;
     gap: 18px;
     width: 100%;
     min-width: 0;
-    padding: 20px;
-    margin: 0;
-    background: var(--rp-surface) !important;
-    border: 1px solid var(--rp-quiet-border);
-    border-radius: 18px;
-    container-type: inline-size;
-    color: var(--rp-text) !important;
+    padding: 4px 0 0;
 }
-.reproductive-system-settings :is(.rp-panel-layout, .rp-controls-column, .rp-status-column, .rp-bottom-actions,
-    .rp-primary-fields, .rp-configuration, .rp-switches, .rp-action-pair, .rp-action-utilities,
-    .rp-meta-options, .rp-expanded-panel) { min-width: 0; }
-.reproductive-system-settings .rp-panel-layout {
+.reproductive-system-settings .rp-main-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.06fr);
     gap: 18px;
     align-items: start;
 }
-.reproductive-system-settings .rp-controls-column,
-.reproductive-system-settings .rp-status-column {
+.reproductive-system-settings .rp-card {
+    min-width: 0;
+    padding: 20px;
+    background: var(--rp-surface) !important;
+    border: 1px solid var(--rp-border-soft);
+    border-radius: var(--rp-radius-xl);
+    box-shadow: var(--rp-shadow);
     display: flex;
     flex-direction: column;
-    gap: 14px;
-    min-width: 0;
-    padding: 18px;
-    background: color-mix(in srgb, var(--rp-surface) 82%, var(--rp-text) 18%);
-    border: 1px solid var(--rp-quiet-border);
-    border-radius: 16px;
+    gap: 16px;
 }
-.reproductive-system-settings .rp-controls-column { padding-right: 18px; }
-.reproductive-system-settings .rp-switches,
-.reproductive-system-settings .rp-primary-fields,
-.reproductive-system-settings .rp-configuration { display: flex; flex-direction: column; gap: 10px; }
-.reproductive-system-settings .rp-switches { margin-bottom: 8px; }
+.reproductive-system-settings .rp-card-head {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.reproductive-system-settings .rp-card-head-compact { gap: 4px; }
+.reproductive-system-settings .rp-card-kicker,
+.reproductive-system-settings .rp-mini-kicker {
+    margin: 0;
+    font-size: 0.78em;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    color: var(--rp-text-faint);
+}
+.reproductive-system-settings .rp-card-head h3,
+.rp-profile-dialog :is(h2, h3) {
+    margin: 0;
+    font-size: 1.4em;
+    line-height: 1.18;
+    font-weight: 700;
+}
+.reproductive-system-settings .rp-card-copy,
+.reproductive-system-settings .rp-mini-note,
+.rp-profile-dialog .rp-hint,
+.rp-profile-dialog .rp-save-state {
+    margin: 0;
+    color: var(--rp-text-soft);
+    font-size: 0.95em;
+}
+.reproductive-system-settings .rp-switch-stack,
+.reproductive-system-settings .rp-mini-options {
+    display: grid;
+    gap: 10px;
+}
 #extensions_settings2 .reproductive-system-settings label.checkbox_label {
     display: flex !important;
-    flex-direction: row;
     align-items: center !important;
     justify-content: space-between;
-    gap: 10px !important;
+    gap: 12px !important;
     width: 100%;
-    min-height: 52px;
-    padding: 10px 13px;
-    background: var(--rp-paper) !important;
-    border: 1px solid var(--rp-quiet-border) !important;
-    border-radius: 13px !important;
+    min-height: 58px;
+    padding: 14px 16px;
+    margin: 0;
+    background: var(--rp-surface-2) !important;
+    border: 1px solid var(--rp-border-soft) !important;
+    border-radius: var(--rp-radius-md) !important;
     color: var(--rp-text) !important;
-    font-size: max(16px, var(--rp-reading-size)) !important;
-    cursor: pointer;
 }
-.reproductive-system-settings label.checkbox_label span { order: 0; flex: 1; min-width: 0; overflow-wrap: break-word; }
-/* Switch is fully CSS-drawn; no theme checkbox glyph, background image or black checkmark. */
+.reproductive-system-settings label.checkbox_label span {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
 #extensions_settings2 .reproductive-system-settings label.checkbox_label input[type="checkbox"] {
     appearance: none !important;
     -webkit-appearance: none !important;
     position: relative;
-    display: block !important;
-    order: 2;
-    flex: 0 0 52px !important;
-    width: 52px !important;
-    min-width: 52px !important;
-    height: 30px !important;
-    min-height: 30px !important;
-    padding: 0 !important;
+    width: 54px !important;
+    min-width: 54px !important;
+    height: 32px !important;
+    min-height: 32px !important;
     margin: 0 !important;
+    padding: 0 !important;
     border-radius: 999px !important;
-    border: 1px solid var(--rp-quiet-border) !important;
-    background: var(--rp-input) !important;
-    cursor: pointer;
-    box-shadow: none !important;
+    background: color-mix(in srgb, var(--rp-input) 82%, var(--rp-surface) 18%) !important;
+    border: 1px solid var(--rp-border) !important;
 }
-.reproductive-system-settings label.checkbox_label input[type="checkbox"]::before {
+#extensions_settings2 .reproductive-system-settings label.checkbox_label input[type="checkbox"]::before {
     content: '';
     position: absolute;
-    width: 20px;
-    height: 20px;
-    left: 4px;
     top: 4px;
-    background: var(--rp-text) !important;
+    left: 4px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
-    transition: transform .18s ease;
+    background: var(--rp-text) !important;
+    transition: transform .2s ease;
 }
 #extensions_settings2 .reproductive-system-settings label.checkbox_label input[type="checkbox"]:checked {
+    background: var(--rp-accent-soft) !important;
     border-color: var(--rp-accent) !important;
-    background: var(--rp-accent-surface) !important;
 }
-.reproductive-system-settings label.checkbox_label input[type="checkbox"]:checked::before { transform: translateX(22px); }
-/* Reclaim fields from broad rules in custom SillyTavern themes. */
+#extensions_settings2 .reproductive-system-settings label.checkbox_label input[type="checkbox"]:checked::before {
+    transform: translateX(22px);
+}
+.reproductive-system-settings .rp-switch-soft {
+    background: color-mix(in srgb, var(--rp-surface) 68%, var(--rp-accent) 8%) !important;
+}
+
 #extensions_settings2 .reproductive-system-settings :is(select, .text_pole, input[type="date"], input[type="number"], input[type="text"], textarea) {
+    width: 100%;
     min-width: 0;
     max-width: 100%;
-    min-height: 44px !important;
-    padding: 9px 12px !important;
+    min-height: 46px !important;
     background: var(--rp-input) !important;
-    border: 1px solid var(--rp-quiet-border) !important;
-    border-radius: 10px !important;
+    border: 1px solid var(--rp-border-soft) !important;
+    border-radius: var(--rp-radius-sm) !important;
     color: var(--rp-text) !important;
-    box-shadow: none !important;
+    padding: 10px 14px !important;
     opacity: 1 !important;
 }
 #extensions_settings2 .reproductive-system-settings :is(button, .menu_button) {
+    width: auto;
     min-width: 0;
-    min-height: 44px !important;
-    background: var(--rp-paper) !important;
-    border: 1px solid var(--rp-quiet-border) !important;
-    border-radius: 10px !important;
+    min-height: 46px !important;
+    padding: 11px 14px !important;
+    background: var(--rp-surface-2) !important;
+    border: 1px solid var(--rp-border-soft) !important;
+    border-radius: var(--rp-radius-sm) !important;
     color: var(--rp-text) !important;
-    box-shadow: none !important;
-    filter: none !important;
-    opacity: 1 !important;
-    line-height: 1.45 !important;
-    padding: 10px 12px !important;
-    text-align: center;
     white-space: normal;
-    overflow-wrap: anywhere;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    box-shadow: none !important;
 }
-#extensions_settings2 .reproductive-system-settings :is(button, .menu_button):hover { background: var(--rp-hover) !important; border-color: var(--rp-accent) !important; }
-#extensions_settings2 .reproductive-system-settings :is(#rp-open-profiles, #repro-setcycle, #repro-partner-cycle-set, #repro-apply-weeks, #repro-css-apply) {
-    background: var(--rp-accent-surface) !important;
+.reproductive-system-settings .rp-button-primary,
+#extensions_settings2 .reproductive-system-settings :is(#repro-setcycle, #repro-partner-cycle-set, #repro-css-apply, #repro-apply-weeks) {
+    background: var(--rp-accent-soft) !important;
     border-color: var(--rp-border) !important;
 }
-.reproductive-system-settings .rp-primary-fields .rp-field-stack {
-    display: flex !important;
-    flex-direction: column;
-    align-items: stretch !important;
-    gap: 6px !important;
+.reproductive-system-settings .rp-ghost-button {
+    background: color-mix(in srgb, var(--rp-surface) 78%, var(--rp-accent) 10%) !important;
 }
-.reproductive-system-settings .rp-primary-fields > .rp-switch { margin-top: 2px; }
-.reproductive-system-settings :is(.rp-field-stack, .rp-form-row, .rp-cycle-edit, .rp-meta-options) :is(label, span) {
-    color: var(--rp-text) !important;
-    font-size: max(16px, var(--rp-reading-size)) !important;
-    opacity: 1 !important;
+.reproductive-system-settings .rp-icon-button {
+    display: grid !important;
+    place-items: center;
+    width: 50px !important;
+    min-width: 50px !important;
+    padding: 0 !important;
 }
-.reproductive-system-settings .rp-primary-fields select { width: 100%; }
-.reproductive-system-settings #rp-open-profiles { width: 100%; margin-top: 4px; }
-.reproductive-system-settings .rp-configuration { padding: 14px 0 0; border-top: 1px solid var(--rp-quiet-border); }
-.reproductive-system-settings .rp-controls-column > label.rp-switch { margin-top: 12px; }
-.reproductive-system-settings .rp-form-row {
+.reproductive-system-settings .rp-theme-glyph {
+    font-size: 18px;
+    line-height: 1;
+}
+.reproductive-system-settings .rp-dual-fields,
+.reproductive-system-settings .rp-settings-cluster,
+.reproductive-system-settings .rp-primary-actions,
+.reproductive-system-settings .rp-meta-row {
     display: grid;
-    grid-template-columns: minmax(110px, 0.7fr) minmax(0, 1.3fr) auto;
-    align-items: center;
-    gap: 10px !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
 }
-.reproductive-system-settings .rp-form-row > span:first-child {
+.reproductive-system-settings .rp-field-card,
+.reproductive-system-settings .rp-form-card,
+.reproductive-system-settings .rp-inline-card,
+.reproductive-system-settings .rp-cycle-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     min-width: 0;
-    overflow-wrap: anywhere;
+    padding: 14px;
+    background: var(--rp-surface-2) !important;
+    border: 1px solid var(--rp-border-soft);
+    border-radius: var(--rp-radius-md);
 }
-.reproductive-system-settings .rp-form-row > select { width: 100%; }
-.reproductive-system-settings .rp-form-row > input { width: 100%; min-width: 0; }
+.reproductive-system-settings :is(.rp-field-card, .rp-form-card, .rp-cycle-panel) > :is(label, span:first-child) {
+    font-size: 0.9em;
+    color: var(--rp-text-soft);
+}
+.reproductive-system-settings .rp-inline-inputs {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 10px;
+    align-items: center;
+}
+.reproductive-system-settings .rp-inline-inputs-cycle {
+    grid-template-columns: 90px minmax(0, 1fr);
+}
+.reproductive-system-settings .rp-form-split .rp-inline-inputs {
+    grid-template-columns: minmax(0, 1fr) 110px;
+}
 .reproductive-system-settings .rp-partner-editor {
     display: grid;
-    grid-template-columns: minmax(0,1fr) 84px minmax(160px, 1fr);
-    align-items: center;
+    grid-template-columns: minmax(0, 1fr) 90px minmax(160px, 1fr);
     gap: 10px;
+    align-items: center;
 }
-.reproductive-system-settings .rp-partner-editor > span { min-width: 0; overflow-wrap: anywhere; }
-.reproductive-system-settings .rp-partner-editor > input { width: 84px !important; }
-.reproductive-system-settings .rp-partner-editor > button { width: 100%; }
-
-/* RIGHT — live cycle state, pregnancy, baby and partner monitors. */
-.reproductive-system-settings #repro-currentcycle {
-    padding: 14px 16px;
+.reproductive-system-settings .rp-inline-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
     min-width: 0;
-    border: 1px solid var(--rp-quiet-border);
-    border-radius: 13px;
-    background: var(--rp-status-surface) !important;
-    color: var(--rp-text) !important;
+}
+.reproductive-system-settings .rp-inline-copy #repro-partner-cycle-info {
     overflow-wrap: anywhere;
 }
-.reproductive-system-settings .rp-cycle-edit { display: flex; align-items: center; gap: 10px !important; flex-wrap: wrap; }
-.reproductive-system-settings .rp-cycle-edit > span { flex: 0 0 auto; }
-.reproductive-system-settings .rp-cycle-edit > input { width: 84px !important; flex: 0 1 84px; }
-.reproductive-system-settings .rp-cycle-edit > button { flex: 1 1 145px; }
-.reproductive-system-settings .rp-status-line { padding: 12px 0 0; border-top: 1px solid var(--rp-quiet-border); font-size: max(16px, var(--rp-reading-size)) !important; opacity: 1 !important; font-weight: 600; }
-.reproductive-system-settings :is(.rp-theme-colour, #repro-status .rp-theme-colour) { color: var(--rp-accent) !important; }
-.reproductive-system-settings hr { width: 100%; height: 0; margin: 0; border: none; border-top: 1px solid var(--rp-quiet-border); }
+.reproductive-system-settings .rp-cycle-banner {
+    padding: 16px;
+    background: color-mix(in srgb, var(--rp-accent) 12%, var(--rp-surface) 88%) !important;
+    border: 1px solid var(--rp-border-soft);
+    border-radius: var(--rp-radius-md);
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+.reproductive-system-settings .rp-status-line {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    padding-top: 4px;
+    font-size: 1.02em;
+    font-weight: 600;
+}
+.reproductive-system-settings #repro-status { color: var(--rp-accent) !important; }
+.reproductive-system-settings .rp-status-stack {
+    display: grid;
+    gap: 12px;
+}
 .reproductive-system-settings .rp-m {
     min-width: 0;
     margin: 0;
-    background: var(--rp-input) !important;
-    border: 1px solid var(--rp-quiet-border);
-    border-radius: 14px;
     overflow: hidden;
-    overflow-wrap: anywhere;
+    background: var(--rp-surface-2) !important;
+    border: 1px solid var(--rp-border-soft);
+    border-radius: var(--rp-radius-lg);
 }
 .reproductive-system-settings .rp-m-head {
-    padding: 14px 16px;
-    font-size: 1.08em;
-    font-weight: 700;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--rp-border-soft);
+    background: color-mix(in srgb, var(--rp-accent) 14%, var(--rp-surface) 86%) !important;
     color: var(--rp-accent) !important;
-    background: var(--rp-accent-surface) !important;
-    border-bottom: 1px solid var(--rp-quiet-border);
+    font-size: 1.22em;
+    font-weight: 700;
 }
-.reproductive-system-settings .rp-m-progress { height: 4px; background: var(--rp-paper); }
-.reproductive-system-settings .rp-m-progress-fill { height: 100%; background: var(--rp-accent); transition: width .2s ease; }
-.reproductive-system-settings .rp-m-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 12px; }
+.reproductive-system-settings .rp-m-progress {
+    height: 4px;
+    background: color-mix(in srgb, var(--rp-input) 82%, transparent);
+}
+.reproductive-system-settings .rp-m-progress-fill {
+    height: 100%;
+    background: var(--rp-accent);
+}
+.reproductive-system-settings .rp-m-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    padding: 12px;
+}
 .reproductive-system-settings .rp-m-cell {
     display: flex;
     flex-direction: column;
     gap: 4px;
     padding: 12px 14px;
+    border: 1px solid var(--rp-border-soft);
+    border-radius: var(--rp-radius-sm);
+    background: color-mix(in srgb, var(--rp-input) 62%, var(--rp-surface) 38%) !important;
     min-width: 0;
-    border: 1px solid var(--rp-quiet-border);
-    background: var(--rp-paper) !important;
-    border-radius: 9px;
 }
-.reproductive-system-settings .rp-m-lbl { font-size: max(16px, var(--rp-reading-size)) !important; overflow-wrap: anywhere; }
-.reproductive-system-settings .rp-m span { font-size: max(16px, var(--rp-reading-size)) !important; opacity: 1 !important; }
-.reproductive-system-settings .rp-m-val { font-weight: 700; overflow-wrap: anywhere; }
-.reproductive-system-settings .rp-m-hp-ok { color: var(--rp-accent) !important; }
-.reproductive-system-settings :is(.rp-m-hp-warn, .rp-m-hp-crit) { color: var(--rp-attention) !important; }
-.reproductive-system-settings .rp-m-warn { border-left: 3px solid var(--rp-attention); padding-left: 10px; }
-.reproductive-system-settings .rp-m-text { padding: 4px 14px 6px; }
+.reproductive-system-settings .rp-m-lbl {
+    font-size: 0.88em !important;
+    color: var(--rp-text-soft);
+}
+.reproductive-system-settings .rp-m-val {
+    font-size: 1.02em;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+.reproductive-system-settings .rp-m-hp-ok,
+.reproductive-system-settings .rp-theme-colour,
+.reproductive-system-settings .rp-phase-label {
+    color: var(--rp-accent) !important;
+}
+.reproductive-system-settings :is(.rp-m-hp-warn, .rp-m-hp-crit) {
+    color: var(--rp-attention) !important;
+}
+.reproductive-system-settings .rp-m-text,
+.reproductive-system-settings .rp-m-warn {
+    padding: 0 16px 12px;
+}
+.reproductive-system-settings .rp-m-warn {
+    color: var(--rp-attention);
+}
 .reproductive-system-settings .rp-m-btn {
-    margin: 7px 12px 12px;
-    padding: 9px 12px;
-    min-height: 44px;
-    background: var(--rp-accent-surface) !important;
-    color: var(--rp-text) !important;
-    border: 1px solid var(--rp-quiet-border);
-    border-radius: 10px;
+    margin: 0 16px 12px;
+    width: calc(100% - 32px);
 }
-.reproductive-system-settings #repro-preg-mon > div[style*="display:flex"],
-.reproductive-system-settings #repro-partner-mon > div[style*="display:flex"] { gap: 9px !important; flex-wrap: wrap; padding-inline: 12px; }
-.reproductive-system-settings #repro-preg-mon > div[style*="display:flex"] > input { width: 72px !important; flex: 0 0 72px; }
-.reproductive-system-settings #repro-preg-mon > div[style*="display:flex"] > button { flex: 1 1 145px !important; }
-.reproductive-system-settings #repro-reanchor-btn { width: calc(100% - 24px); }
 .reproductive-system-settings .rp-m-weeks-row {
     display: grid;
-    grid-template-columns: auto 72px auto minmax(140px, 1fr);
+    grid-template-columns: auto 78px auto minmax(150px, 1fr);
     align-items: center;
     gap: 10px;
-    margin: 10px 12px 0;
+    margin: 4px 16px 12px;
 }
 .reproductive-system-settings .rp-m-inline-label,
-.reproductive-system-settings .rp-m-inline-suffix { color: var(--rp-text) !important; }
-.reproductive-system-settings .rp-m-btn-primary { margin: 0 !important; width: 100%; }
-.reproductive-system-settings .rp-m-btn-block { width: calc(100% - 24px); }
-
-/* Full-width action strip and advanced editors below the two columns. */
-.reproductive-system-settings .rp-bottom-actions { display: flex; flex-direction: column; gap: 12px; }
-.reproductive-system-settings .rp-action-pair { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
-.reproductive-system-settings .rp-action-pair > button {
-    width: 100% !important;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+.reproductive-system-settings .rp-m-inline-suffix {
+    color: var(--rp-text-soft) !important;
+    font-size: 0.94em;
 }
+.reproductive-system-settings .rp-m-btn-primary { margin: 0 !important; width: 100%; }
+.reproductive-system-settings .rp-m-btn-block { width: calc(100% - 32px); }
 
-.reproductive-system-settings .rp-action-utilities { display: grid !important; grid-template-columns: 1fr 1fr 52px; gap: 10px !important; }
-.reproductive-system-settings .rp-action-utilities > div { flex: none !important; width: 100%; min-width: 0; }
-.reproductive-system-settings #repro-theme-btn { display: grid; place-items: center; }
-.reproductive-system-settings .rp-theme-glyph { font-size: 19px; line-height: 1; }
-.reproductive-system-settings .rp-meta-options { display: grid; grid-template-columns: 1fr; gap: 10px; align-items: start; }
-.reproductive-system-settings .rp-meta-options > .rp-form-row { min-height: 50px; }
-.reproductive-system-settings .rp-meta-options > label { min-height: 50px; }
-.reproductive-system-settings #repro-purge-tags { width: 100%; }
-.reproductive-system-settings #repro-stats { padding: 12px 3px 2px; border-top: 1px solid var(--rp-quiet-border); font-size: max(16px, var(--rp-reading-size)) !important; opacity: 1 !important; overflow-wrap: anywhere; }
-.reproductive-system-settings :is(#repro-manual-panel, #repro-css-panel) {
+.reproductive-system-settings .rp-card-actions { gap: 14px; }
+.reproductive-system-settings .rp-primary-actions button,
+.reproductive-system-settings .rp-utility-actions > * { width: 100% !important; }
+.reproductive-system-settings .rp-primary-actions-single {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.reproductive-system-settings .rp-primary-actions-single > *:first-child,
+.reproductive-system-settings .rp-primary-actions-single > *:last-child {
+    grid-column: 1 / -1;
+}
+.reproductive-system-settings .rp-utility-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 50px;
+    gap: 12px;
+}
+.reproductive-system-settings .rp-expanded-panel {
+    display: grid;
+    gap: 12px;
     min-width: 0;
     padding: 18px;
-    border: 1px solid var(--rp-quiet-border);
-    border-radius: 12px;
-    background: var(--rp-paper) !important;
-    gap: 12px !important;
+    background: color-mix(in srgb, var(--rp-surface) 84%, var(--rp-accent) 8%) !important;
+    border: 1px solid var(--rp-border-soft);
+    border-radius: var(--rp-radius-lg);
 }
-.reproductive-system-settings :is(#repro-manual-panel, #repro-css-panel) > div { gap: 9px !important; flex-wrap: wrap; min-width: 0; }
-.reproductive-system-settings :is(#repro-manual-panel, #repro-css-panel) input,
-.reproductive-system-settings :is(#repro-manual-panel, #repro-css-panel) select { flex: 1 1 120px !important; min-width: 0 !important; }
-.reproductive-system-settings :is(#repro-manual-panel, #repro-css-panel) small {
-    font-size: max(16px, var(--rp-reading-size)) !important;
-    opacity: 1 !important;
+.reproductive-system-settings .rp-expanded-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 2px;
 }
-.reproductive-system-settings #repro-custom-css {
-    width: 100%; min-height: 160px; padding: 12px; resize: vertical;
-    font-family: ui-monospace, Consolas, monospace !important;
-    white-space: pre; tab-size: 2;
+.reproductive-system-settings .rp-expanded-head strong {
+    font-size: 1.08em;
 }
-.reproductive-system-settings .repro-button-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-.reproductive-system-settings .rp-setting-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 6px 0; }
-.reproductive-system-settings .rp-setting-row :is(select, input) { flex: 1 1 160px; min-width: 0; }
-.reproductive-system-settings #repro-partner-cycle-row input { flex: 0 0 84px !important; }
-.reproductive-system-settings #repro-partner-cycle-row button { flex: 1 1 160px; }
+.reproductive-system-settings .rp-expanded-head-secondary {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid var(--rp-border-soft);
+}
+.reproductive-system-settings .rp-form-inline {
+    display: grid;
+    grid-template-columns: minmax(110px, .7fr) minmax(0, 1.3fr);
+    align-items: center;
+}
+.reproductive-system-settings .rp-manual-fetus-row .rp-inline-inputs,
+.reproductive-system-settings .rp-baby-top-row,
+.reproductive-system-settings .rp-baby-bottom-row,
+.reproductive-system-settings .rp-css-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.reproductive-system-settings .rp-baby-bottom-row {
+    grid-template-columns: 90px 110px minmax(0, 1fr);
+}
+.reproductive-system-settings .rp-code-area {
+    resize: vertical;
+    min-height: 170px;
+    white-space: pre;
+    tab-size: 2;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace !important;
+}
+.reproductive-system-settings .rp-caption,
+.reproductive-system-settings #repro-stats {
+    color: var(--rp-text-soft);
+    font-size: 0.92em !important;
+}
+.reproductive-system-settings #repro-stats {
+    padding-top: 4px;
+}
+.reproductive-system-settings .rp-meta-row {
+    align-items: stretch;
+}
+.reproductive-system-settings .rp-light-switch {
+    min-height: 100%;
+}
 
-/* Modern detailed editor (dialog in reproductive-ui.js). */
+/* Profile dialog and detailed settings */
 .rp-profile-dialog {
-    width: min(1050px, calc(100vw - 24px));
-    max-width: calc(100vw - 24px);
-    max-height: calc(100dvh - 24px);
-    margin: auto;
+    width: min(1060px, calc(100vw - 30px));
+    max-width: 1060px;
+    max-height: calc(100dvh - 30px);
+    margin: 15px auto;
     padding: 24px;
+    border: 1px solid var(--rp-border-soft);
+    border-radius: 26px;
+    background: var(--rp-surface) !important;
+    color: var(--rp-text) !important;
     overflow: auto;
-    background: var(--rp-surface);
-    border: 1px solid var(--rp-border);
+}
+.rp-profile-dialog::backdrop {
+    background: color-mix(in srgb, var(--SmartThemeBlurTintColor) 85%, transparent);
+}
+.rp-profile-dialog .rp-editor-head {
+    display: flex;
+    gap: 18px;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+.rp-profile-dialog .rp-editor-head > div {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.rp-profile-dialog .rp-eyebrow {
+    margin: 0;
+    font-size: 0.8em;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    color: var(--rp-text-faint);
+}
+.rp-profile-dialog .rp-editor-head button[data-close] {
+    width: 48px;
+    min-width: 48px;
+    padding: 0 !important;
+    font-size: 28px !important;
+    line-height: 1 !important;
+    display: grid;
+    place-items: center;
+    border-radius: 999px !important;
+}
+.rp-profile-dialog .rp-editor-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(320px, .85fr);
+    gap: 18px;
+    align-items: start;
+}
+.rp-profile-dialog .rp-editor-main,
+.rp-profile-dialog .rp-editor-aside {
+    display: grid;
+    gap: 18px;
+}
+.rp-profile-dialog .rp-paper {
+    margin: 0;
+    background: var(--rp-surface-2) !important;
+    border: 1px solid var(--rp-border-soft);
     border-radius: 20px;
-    box-shadow: none;
+    overflow: hidden;
 }
-.rp-profile-dialog::backdrop { background: var(--rp-screen); }
-.rp-editor-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 20px; }
-.rp-editor-head h2 { margin: 0 0 8px; font-size: 1.55em; line-height: 1.3; font-weight: 700; }
-.rp-editor-head p { margin: 0; max-width: 65ch; }
-.rp-editor-head .rp-eyebrow { font-weight: 700; letter-spacing: .05em; margin-bottom: 10px; }
-.rp-editor-head [data-close] { width: 44px; height: 44px; flex-shrink: 0; padding: 0; }
-.rp-persons { display: flex; gap: 10px; flex-wrap: wrap; margin: 0 0 20px; }
-.rp-persons button { flex: 1 1 180px; }
-.rp-persons button[aria-pressed="true"] { border-color: var(--rp-accent); background: var(--rp-accent-surface); font-weight: 700; }
-.rp-editor-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px; align-items: start; }
-.rp-editor-main, .rp-editor-aside { display: grid; gap: 16px; min-width: 0; }
-.rp-paper { min-width: 0; border: 1px solid var(--rp-border); border-radius: 14px; background: var(--rp-paper); overflow: hidden; }
-.rp-paper > :is(h3, summary) { margin: 0; min-height: 58px; padding: 14px 18px; font-size: 1.1em; font-weight: 700; }
-.rp-paper > summary { cursor: pointer; }
-.rp-paper > :is(h3, summary) span { color: var(--rp-accent); }
-.rp-section-body { display: grid; gap: 16px; padding: 10px 18px 20px; }
-.rp-field { display: grid; gap: 8px; min-width: 0; }
-.rp-field > span { font-weight: 600; }
-.rp-field :is(input, select, textarea) { display: block; width: 100%; min-width: 0; }
-.rp-check { display: flex; align-items: center; gap: 12px; min-height: 44px; cursor: pointer; }
-.rp-hint { margin: 0; max-width: 65ch; color: var(--rp-text); }
-.rp-state { margin: 0; font-weight: 700; }
-.rp-presets { display: flex; gap: 8px; flex-wrap: wrap; }
-.rp-presets button { min-width: 58px; }
-.rp-tags { min-width: 0; padding: 12px; border: 1px solid var(--rp-border); border-radius: 10px; }
-.rp-profile-dialog :is(details:not(.rp-paper) > summary) { min-height: 44px; display: flex; align-items: center; padding: 8px 0; }
-.rp-profile-dialog meter { width: 100%; height: 18px; accent-color: var(--rp-accent); }
-.rp-profile-dialog li { margin: 0 0 10px; overflow-wrap: anywhere; }
-.rp-save-state { margin: 0; border-top: 1px solid var(--rp-border); padding-top: 14px; }
+.rp-profile-dialog .rp-paper > :is(h3, summary) {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    padding: 16px 18px;
+    background: color-mix(in srgb, var(--rp-surface) 74%, var(--rp-accent) 10%);
+    border: 0;
+    font-size: 1.08em;
+    font-weight: 700;
+}
+.rp-profile-dialog .rp-paper summary {
+    cursor: pointer;
+    list-style: none;
+}
+.rp-profile-dialog .rp-paper summary::-webkit-details-marker { display: none; }
+.rp-profile-dialog .rp-section-body {
+    display: grid;
+    gap: 12px;
+    padding: 18px;
+}
+.rp-profile-dialog .rp-section-body > :is(label, .checkbox_label) {
+    margin: 0;
+}
+.rp-profile-dialog .rp-section-body > button {
+    width: 100%;
+}
+.rp-profile-dialog .rp-paper :is(input, select, textarea, button, .menu_button) {
+    width: 100%;
+}
+.rp-profile-dialog .rp-paper .checkbox_label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: space-between;
+    min-height: 54px;
+    padding: 12px 14px;
+    background: color-mix(in srgb, var(--rp-input) 72%, var(--rp-surface) 28%);
+    border: 1px solid var(--rp-border-soft);
+    border-radius: 14px;
+}
+.rp-profile-dialog .rp-save-state {
+    padding: 12px 14px;
+    background: color-mix(in srgb, var(--rp-accent) 10%, var(--rp-surface) 90%);
+    border: 1px solid var(--rp-border-soft);
+    border-radius: 14px;
+}
 
-/* Info blocks in the chat — inherit the chat theme, not fixed extension colours. */
+/* Infoblock */
 details.repro {
-    width: 100%; max-width: 470px; min-width: 0; margin: 0 auto 12px;
-    background: var(--rp-surface); border: 1px solid var(--rp-border); border-radius: 14px;
-    overflow: hidden; overflow-wrap: anywhere;
+    margin: 0 auto 14px;
+    max-width: 520px;
+    background: var(--rp-surface) !important;
+    border: 1px solid var(--rp-border-soft);
+    border-radius: 18px;
+    overflow: hidden;
 }
-details.repro > summary { list-style: none; cursor: pointer; min-height: 56px; }
-details.repro > summary::-webkit-details-marker { display: none; }
-details.repro .repro-header { display: flex; align-items: center; gap: 10px; padding: 12px 14px; min-height: 56px; }
-details.repro[open] > summary { border-bottom: 1px solid var(--rp-border); }
-details.repro .repro-icon { width: 32px; height: 32px; flex-shrink: 0; display: grid; place-items: center; border: 1px solid var(--rp-accent); border-radius: 50%; }
-details.repro .repro-icon i { color: var(--rp-accent); font-size: 16px; }
-details.repro .repro-title { font-weight: 700; min-width: 0; }
-details.repro .repro-badge { margin-left: auto; padding: 4px 8px; border: 1px solid var(--rp-border); border-radius: 999px; font-weight: 600; }
-details.repro .repro-baby-name { display: inline-flex; align-items: center; min-height: 44px; }
-details.repro .repro-chev { width: 24px; height: 24px; flex-shrink: 0; display: grid; place-items: center; transition: transform .2s; }
+details.repro summary {
+    list-style: none;
+    cursor: pointer;
+}
+details.repro summary::-webkit-details-marker { display: none; }
+details.repro .repro-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: color-mix(in srgb, var(--rp-surface) 74%, var(--rp-accent) 10%) !important;
+}
+details.repro .repro-icon {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--rp-border);
+    border-radius: 50%;
+    flex: 0 0 30px;
+}
+details.repro .repro-icon i { color: var(--rp-accent); font-size: 12px; }
+details.repro .repro-title { font-size: 1.03em; font-weight: 700; }
+details.repro .repro-badge {
+    margin-left: auto;
+    padding: 4px 10px;
+    border: 1px solid var(--rp-border-soft);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--rp-surface) 70%, var(--rp-accent) 12%);
+    font-size: .86em;
+    font-weight: 600;
+}
+details.repro .repro-chev {
+    display: grid;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    color: var(--rp-text-soft);
+    transition: transform .18s ease;
+}
 details.repro[open] .repro-chev { transform: rotate(180deg); }
-details.repro .repro-chev i { color: var(--rp-text); font-size: 16px; }
-details.repro .repro-c { padding: 14px; background: var(--rp-paper); }
-details.repro .repro-bar { height: 6px; margin-bottom: 12px; overflow: hidden; border-radius: 99px; background: var(--rp-input); }
-details.repro .repro-bar-fill { height: 100%; border-radius: inherit; background: var(--rp-accent); transition: width .2s; }
+details.repro .repro-c {
+    padding: 14px 16px 16px;
+    display: grid;
+    gap: 10px;
+}
+details.repro .repro-bar {
+    height: 4px;
+    background: color-mix(in srgb, var(--rp-input) 82%, transparent);
+    border-radius: 999px;
+    overflow: hidden;
+}
+details.repro .repro-bar-fill { height: 100%; background: var(--rp-accent); }
 details.repro .repro-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-details.repro .repro-stat { display: flex; align-items: flex-start; gap: 10px; min-width: 0; padding: 11px; border: 1px solid var(--rp-border); border-radius: 10px; }
+details.repro .repro-stat,
+details.repro .repro-note {
+    min-width: 0;
+    padding: 12px 13px;
+    border: 1px solid var(--rp-border-soft);
+    border-radius: 12px;
+    background: var(--rp-surface-2) !important;
+}
 details.repro .repro-wide { grid-column: 1 / -1; }
-details.repro .rp-si { display: grid; place-items: center; flex-shrink: 0; width: 24px; height: 24px; border-radius: 5px; }
-details.repro .rp-si i { font-size: 16px; color: var(--rp-accent); }
-details.repro :is(.rp-lbl, .rp-val, .rp-sub) { color: var(--rp-text); overflow-wrap: anywhere; }
-details.repro .rp-val { font-weight: 700; }
-details.repro .rp-val-warn { color: var(--rp-attention); font-weight: 700; }
-details.repro .repro-note { grid-column: 1 / -1; padding: 10px 12px; margin-top: 8px; border: 1px solid var(--rp-border); border-radius: 10px; }
-details.repro .repro-rec, details.repro .rp-special-note { border-left: 3px solid var(--rp-attention); }
-.rp-theme-colour, .rp-phase-label { color: var(--rp-text) !important; }
-details.repro .repro-health { display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--rp-border); border-radius: 8px; padding: 3px 8px; font-weight: 600; }
-details.repro .repro-health.warning,
-details.repro .repro-health.critical { border-left: 3px solid var(--rp-attention); }
-.rp-infoblock-inserted { display: block; min-width: 0; }
-.rp-infoblock-inserted .repro-mom-stat { margin: 8px auto; max-width: 470px; }
-details.repro.repro-multi .repro-multi-body { padding: 10px; display: grid; gap: 10px; }
+details.repro .rp-si {
+    display: inline-grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    margin-right: 8px;
+    border: 1px solid var(--rp-border);
+    border-radius: 7px;
+    color: var(--rp-accent);
+}
+details.repro .rp-lbl { display: block; color: var(--rp-text-soft); font-size: .84em; margin-bottom: 2px; }
+details.repro .rp-val { display: block; font-size: 1em; font-weight: 700; overflow-wrap: anywhere; }
+details.repro .rp-sub { color: var(--rp-text-soft); font-size: .88em; font-weight: 400; }
+details.repro .repro-note { line-height: 1.55; }
+details.repro .repro-rec,
+details.repro .rp-special-note { border-left: 3px solid var(--rp-attention); }
+details.repro .repro-health {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border: 1px solid var(--rp-border);
+    border-radius: 999px;
+    font-size: .88em;
+    font-weight: 700;
+}
+details.repro.repro-multi .repro-multi-body { display: grid; gap: 10px; padding: 10px; }
 details.repro.repro-multi details.repro { max-width: none; margin: 0; }
-details.repro.repro-multi details.repro .repro-header { padding: 10px 12px; }
-details.repro.repro-multi details.repro .repro-c { padding: 12px; }
+.rp-infoblock-inserted { display: block; min-width: 0; }
+.rp-infoblock-inserted .repro-mom-stat { margin: 10px auto; max-width: 540px; }
+
+/* Dashboard responsiveness */
+@container (max-width: 980px) {
+    .reproductive-system-settings .rp-main-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@container (max-width: 720px) {
+    .reproductive-system-settings .rp-card { padding: 18px; }
+    .reproductive-system-settings .rp-dual-fields,
+    .reproductive-system-settings .rp-settings-cluster,
+    .reproductive-system-settings .rp-primary-actions,
+    .reproductive-system-settings .rp-meta-row { grid-template-columns: 1fr; }
+    .reproductive-system-settings .rp-primary-actions-single { grid-template-columns: 1fr; }
+    .reproductive-system-settings .rp-partner-editor,
+    .reproductive-system-settings .rp-utility-actions,
+    .reproductive-system-settings .rp-inline-inputs,
+    .reproductive-system-settings .rp-form-inline,
+    .reproductive-system-settings .rp-baby-bottom-row,
+    .reproductive-system-settings .rp-m-weeks-row { grid-template-columns: 1fr; }
+    .reproductive-system-settings .rp-inline-inputs-cycle { grid-template-columns: 1fr; }
+}
+@container (max-width: 430px) {
+    .reproductive-system-settings .rp-card { padding: 16px; }
+    .reproductive-system-settings .rp-m-grid,
+    details.repro .repro-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 900px) {
+    .rp-profile-dialog { width: calc(100vw - 20px); max-height: calc(100dvh - 20px); padding: 16px; }
+    .rp-profile-dialog .rp-editor-grid { grid-template-columns: 1fr; }
+}
+
 
 /* Shared fixed overlay and dialog surfaces, including native <dialog> elements. */
 :is(#repro-birth-overlay, #rp-tree-overlay, #rp-quick-overlay, #rp-theme-overlay, .rg-overlay) {
