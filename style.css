@@ -1,88 +1,88 @@
-/* Reproductive System 4.0.1 — unified theme-native, flat, readable interface.
-   This is the ONLY extension stylesheet; no historical glass/light/minimal overrides.
-   All painted colours resolve from the currently active SillyTavern SmartTheme. */
+/* Reproductive System — custom dashboard skin, built from the active SillyTavern theme.
+   Every painted colour below is a host-theme token or a mixture of host-theme tokens.
+   No independent palette, gradients, glows or whole-application overrides. */
 :root {
     --rp-reading-size: 16px;
     --rp-text: var(--SmartThemeBodyColor);
     --rp-surface: var(--SmartThemeBlurTintColor);
-    --rp-paper: color-mix(in srgb, var(--SmartThemeBlurTintColor) 88%, var(--SmartThemeBodyColor) 12%);
-    --rp-input: color-mix(in srgb, var(--SmartThemeBlurTintColor) 80%, var(--SmartThemeBodyColor) 20%);
-    --rp-border: color-mix(in srgb, var(--SmartThemeBorderColor) 60%, var(--SmartThemeBodyColor) 40%);
-    --rp-accent: var(--SmartThemeUnderlineColor, var(--SmartThemeBodyColor));
-    --rp-accent-surface: color-mix(in srgb, var(--rp-surface) 85%, var(--rp-accent) 15%);
-    --rp-hover: color-mix(in srgb, var(--rp-paper) 84%, var(--rp-accent) 16%);
-    --rp-attention: var(--SmartThemeQuoteColor, var(--SmartThemeBodyColor));
-    --rp-screen: color-mix(in srgb, var(--SmartThemeBlurTintColor) 86%, transparent);
+    --rp-paper: color-mix(in srgb, var(--SmartThemeBlurTintColor) 92%, var(--SmartThemeBodyColor) 8%);
+    --rp-input: color-mix(in srgb, var(--SmartThemeBlurTintColor) 96%, var(--SmartThemeBodyColor) 4%);
+    --rp-border: color-mix(in srgb, var(--SmartThemeBorderColor) 64%, var(--SmartThemeBodyColor) 36%);
+    --rp-quiet-border: color-mix(in srgb, var(--SmartThemeBorderColor) 42%, var(--SmartThemeBlurTintColor) 58%);
+    --rp-accent: var(--customThemeColor, var(--SmartThemeEmColor, var(--SmartThemeUnderlineColor)));
+    --rp-attention: var(--SmartThemeQuoteColor, var(--SmartThemeEmColor));
+    --rp-accent-surface: color-mix(in srgb, var(--SmartThemeBlurTintColor) 79%, var(--rp-accent) 21%);
+    --rp-hover: color-mix(in srgb, var(--SmartThemeBlurTintColor) 72%, var(--rp-accent) 28%);
+    --rp-status-surface: color-mix(in srgb, var(--SmartThemeBlurTintColor) 86%, var(--rp-attention) 14%);
+    --rp-screen: color-mix(in srgb, var(--SmartThemeBlurTintColor) 90%, transparent);
 }
-/* The existing Light mode switch adjusts tone using the host theme only. */
+/* Historical light-mode setting remains usable but never substitutes another palette. */
 body[data-rp-light] {
-    --rp-paper: color-mix(in srgb, var(--SmartThemeBlurTintColor) 76%, var(--SmartThemeBodyColor) 24%);
-    --rp-input: color-mix(in srgb, var(--SmartThemeBlurTintColor) 72%, var(--SmartThemeBodyColor) 28%);
-    --rp-accent-surface: color-mix(in srgb, var(--SmartThemeBlurTintColor) 76%, var(--SmartThemeUnderlineColor) 24%);
+    --rp-paper: color-mix(in srgb, var(--SmartThemeBlurTintColor) 85%, var(--SmartThemeBodyColor) 15%);
+    --rp-input: color-mix(in srgb, var(--SmartThemeBlurTintColor) 91%, var(--SmartThemeBodyColor) 9%);
 }
 
-/* Shared typographic rhythm: never change the host application's colours. */
+/* Scoped baseline: the user's global theme must not change the dashboard's geometry. */
 :is(.reproductive-system-settings, .rp-profile-dialog, details.repro, #repro-birth-overlay,
-    #rp-tree-overlay, #rp-quick-overlay, #rp-theme-overlay, .custom-notification,
-    .rg-overlay) {
+    #rp-tree-overlay, #rp-quick-overlay, #rp-theme-overlay, .custom-notification, .rg-overlay) {
     color: var(--rp-text);
-    font-family: Arial, Verdana, sans-serif;
+    font-family: inherit;
     font-size: max(16px, var(--rp-reading-size)) !important;
+    font-style: normal !important;
     font-weight: 400;
-    line-height: 1.6 !important;
-    letter-spacing: .015em;
-    word-spacing: .035em;
-    text-shadow: none;
+    line-height: 1.55 !important;
+    letter-spacing: .008em;
+    word-spacing: .025em;
+    text-shadow: none !important;
 }
 :is(.reproductive-system-settings, .rp-profile-dialog, details.repro, #repro-birth-overlay,
-    #rp-tree-overlay, #rp-quick-overlay, #rp-theme-overlay, .custom-notification,
-    .rg-overlay),
+    #rp-tree-overlay, #rp-quick-overlay, #rp-theme-overlay, .custom-notification, .rg-overlay),
 :is(.reproductive-system-settings, .rp-profile-dialog, details.repro, #repro-birth-overlay,
-    #rp-tree-overlay, #rp-quick-overlay, #rp-theme-overlay, .custom-notification,
-    .rg-overlay) * { box-sizing: border-box; background-image: none !important; text-shadow: none !important; font-style: normal !important; }
+    #rp-tree-overlay, #rp-quick-overlay, #rp-theme-overlay, .custom-notification, .rg-overlay) * {
+    box-sizing: border-box;
+    background-image: none !important;
+    text-shadow: none !important;
+    font-style: normal !important;
+}
 :is(.reproductive-system-settings, .rp-profile-dialog, details.repro, .rb-dialog,
     .rp-tree-dialog, .rp-quick-dialog, .rp-th-dialog, .rg-card) :is(small, span, label, p, li, div, b, strong) {
-    line-height: 1.6;
+    line-height: 1.55;
 }
 :is(.reproductive-system-settings, .rp-profile-dialog, details.repro, .rb-dialog,
-    .rp-tree-dialog, .rp-quick-dialog, .rp-th-dialog, .rg-card) :is(small, span, label, p) { opacity: 1; }
-:is(.reproductive-system-settings, .rp-profile-dialog, details.repro, .rb-dialog,
+    .rp-tree-dialog, .rp-quick-dialog, .rp-th-dialog, .rg-card) :is(small, span, label, p) { opacity: 1 !important; }
+:is(.reproductive-system-settings, .rp-profile-dialog, .rb-dialog,
     .rp-tree-dialog, .rp-quick-dialog, .rp-th-dialog, .rg-card) :is(button, input, select, textarea, .menu_button) {
-    font: inherit;
+    font-family: inherit !important;
     font-size: max(16px, var(--rp-reading-size)) !important;
+    line-height: 1.4 !important;
     color: var(--rp-text) !important;
-    background: var(--rp-input);
-    border: 1px solid var(--rp-border);
-    border-radius: 11px;
-    min-height: 44px !important;
-    height: auto;
+    background: var(--rp-input) !important;
+    border: 1px solid var(--rp-quiet-border) !important;
+    border-radius: 10px !important;
+    min-height: 44px;
     max-width: 100%;
-    padding: 10px 12px;
-    box-shadow: none;
+    padding: 9px 12px;
+    box-shadow: none !important;
+    filter: none !important;
 }
 :is(.reproductive-system-settings, .rp-profile-dialog, .rb-dialog,
     .rp-tree-dialog, .rp-quick-dialog, .rp-th-dialog, .rg-card) :is(button, .menu_button, summary, [role="button"]) { cursor: pointer; }
 :is(.reproductive-system-settings, .rp-profile-dialog, .rb-dialog,
     .rp-tree-dialog, .rp-quick-dialog, .rp-th-dialog, .rg-card) :is(button, .menu_button):hover:not(:disabled) {
-    background: var(--rp-hover);
-    border-color: var(--rp-accent);
+    background: var(--rp-hover) !important;
+    border-color: var(--rp-accent) !important;
 }
 :is(.reproductive-system-settings, .rp-profile-dialog, .rb-dialog,
     .rp-tree-dialog, .rp-quick-dialog, .rp-th-dialog, .rg-card) :is(button, input, select, textarea):disabled {
     cursor: default;
-    border-style: dashed;
+    border-style: dashed !important;
 }
 :is(.reproductive-system-settings, .rp-profile-dialog, details.repro, #repro-birth-overlay,
     #rp-tree-overlay, #rp-quick-overlay, #rp-theme-overlay, .rg-overlay) :focus-visible {
-    outline: 3px solid var(--rp-accent);
+    outline: 2px solid var(--rp-accent) !important;
     outline-offset: 2px;
 }
 :is(.reproductive-system-settings, .rp-profile-dialog, .rb-dialog) :is(input[type="checkbox"], input[type="radio"]) {
-    width: 22px;
-    min-width: 22px;
-    height: 22px;
-    min-height: 22px;
-    padding: 0;
     flex-shrink: 0;
     accent-color: var(--rp-accent);
 }
@@ -90,124 +90,298 @@ body[data-rp-light] {
     color: var(--rp-text);
     opacity: 1;
 }
-:is(.reproductive-system-settings, .rp-profile-dialog, .rb-dialog, .rg-card) :is(hr, fieldset) { border-color: var(--rp-border); }
+:is(.reproductive-system-settings, .rp-profile-dialog, .rb-dialog, .rg-card) :is(hr, fieldset) { border-color: var(--rp-quiet-border); }
 
-/* Settings in the native SillyTavern extension drawer. */
-.reproductive-system-settings {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 14px;
-    min-width: 0;
-    width: 100%;
-    padding: 12px;
-    background: var(--rp-surface);
-    container-type: inline-size;
+/* Native extension accordion header — targeted, never restyle other extensions. */
+#extensions_settings2 .inline-drawer:has(> .inline-drawer-content > .reproductive-system-settings) > .inline-drawer-toggle.inline-drawer-header {
+    min-height: 48px;
+    padding: 10px 14px !important;
+    margin: 0 0 8px !important;
+    background: var(--rp-accent-surface) !important;
+    border: 1px solid var(--rp-quiet-border) !important;
+    border-radius: 12px !important;
+    color: var(--rp-text) !important;
+    box-shadow: none !important;
 }
-.reproductive-system-settings > * { grid-column: 1 / -1; }
-.reproductive-system-settings .inline-drawer-content { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-.reproductive-system-settings > div { min-width: 0; gap: 12px !important; flex-wrap: wrap; }
-.reproductive-system-settings > div:has(> #repro-trackfor),
-.reproductive-system-settings > div:has(> #repro-carrier-mode) {
-    grid-column: span 1;
-    display: flex !important;
-    flex-direction: column;
-    align-items: stretch !important;
-    gap: 8px !important;
+#extensions_settings2 .inline-drawer:has(> .inline-drawer-content > .reproductive-system-settings) > .inline-drawer-toggle.inline-drawer-header::before { display: none !important; }
+#extensions_settings2 .inline-drawer:has(> .inline-drawer-content > .reproductive-system-settings) > .inline-drawer-toggle.inline-drawer-header > b {
+    flex: 1; font-size: max(18px, var(--rp-reading-size)) !important; font-weight: 700;
 }
-.reproductive-system-settings label.checkbox_label {
+#extensions_settings2 .inline-drawer:has(> .inline-drawer-content > .reproductive-system-settings) .rp-header-symbol {
+    display: grid; place-items: center; flex: 0 0 30px; width: 30px; height: 30px;
+    margin-right: 12px; border: 1px solid var(--rp-border); border-radius: 50%;
+    color: var(--rp-accent) !important; font-size: 18px !important;
+}
+
+/* MAIN DASHBOARD — the existing HTML is regrouped, not duplicated. */
+#extensions_settings2 .reproductive-system-settings {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 14px;
-    min-height: 50px;
+    flex-direction: column;
+    gap: 16px;
     width: 100%;
-    padding: 10px 12px;
-    border: 1px solid var(--rp-border);
-    border-radius: 12px;
-    background: var(--rp-paper);
+    min-width: 0;
+    padding: 16px;
+    margin: 0;
+    background: var(--rp-surface) !important;
+    border: 1px solid var(--rp-quiet-border);
+    border-radius: 15px;
+    container-type: inline-size;
+    color: var(--rp-text) !important;
+}
+.reproductive-system-settings :is(.rp-panel-layout, .rp-controls-column, .rp-status-column, .rp-bottom-actions,
+    .rp-primary-fields, .rp-configuration, .rp-switches, .rp-action-pair, .rp-action-utilities,
+    .rp-meta-options, .rp-expanded-panel) { min-width: 0; }
+.reproductive-system-settings .rp-panel-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
+    gap: 18px;
+    align-items: start;
+}
+.reproductive-system-settings .rp-controls-column,
+.reproductive-system-settings .rp-status-column {
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+    min-width: 0;
+}
+.reproductive-system-settings .rp-controls-column { padding-right: 18px; border-right: 1px solid var(--rp-quiet-border); }
+.reproductive-system-settings .rp-switches,
+.reproductive-system-settings .rp-primary-fields,
+.reproductive-system-settings .rp-configuration { display: flex; flex-direction: column; gap: 9px; }
+.reproductive-system-settings .rp-switches { margin-bottom: 8px; }
+#extensions_settings2 .reproductive-system-settings label.checkbox_label {
+    display: flex !important;
+    flex-direction: row;
+    align-items: center !important;
+    justify-content: space-between;
+    gap: 10px !important;
+    width: 100%;
+    min-height: 50px;
+    padding: 10px 13px;
+    background: var(--rp-paper) !important;
+    border: 1px solid var(--rp-quiet-border) !important;
+    border-radius: 11px !important;
+    color: var(--rp-text) !important;
+    font-size: max(16px, var(--rp-reading-size)) !important;
     cursor: pointer;
 }
-.reproductive-system-settings label.checkbox_label input[type="checkbox"] {
+.reproductive-system-settings label.checkbox_label span { order: 0; flex: 1; min-width: 0; overflow-wrap: break-word; }
+/* Switch is fully CSS-drawn; no theme checkbox glyph, background image or black checkmark. */
+#extensions_settings2 .reproductive-system-settings label.checkbox_label input[type="checkbox"] {
     appearance: none !important;
     -webkit-appearance: none !important;
     position: relative;
+    display: block !important;
     order: 2;
-    display: inline-block;
-    flex: 0 0 52px;
+    flex: 0 0 52px !important;
     width: 52px !important;
     min-width: 52px !important;
     height: 30px !important;
     min-height: 30px !important;
     padding: 0 !important;
+    margin: 0 !important;
     border-radius: 999px !important;
-    border: 1px solid var(--rp-border) !important;
+    border: 1px solid var(--rp-quiet-border) !important;
     background: var(--rp-input) !important;
     cursor: pointer;
+    box-shadow: none !important;
 }
 .reproductive-system-settings label.checkbox_label input[type="checkbox"]::before {
     content: '';
     position: absolute;
-    left: 4px;
-    top: 4px;
     width: 20px;
     height: 20px;
+    left: 4px;
+    top: 4px;
+    background: var(--rp-text) !important;
     border-radius: 50%;
-    background: var(--rp-text);
-    transition: transform .2s ease;
+    transition: transform .18s ease;
 }
-.reproductive-system-settings label.checkbox_label input[type="checkbox"]:checked {
-    background: var(--rp-accent-surface) !important;
+#extensions_settings2 .reproductive-system-settings label.checkbox_label input[type="checkbox"]:checked {
     border-color: var(--rp-accent) !important;
+    background: var(--rp-accent-surface) !important;
 }
 .reproductive-system-settings label.checkbox_label input[type="checkbox"]:checked::before { transform: translateX(22px); }
-.reproductive-system-settings .text_pole,
-.reproductive-system-settings .menu_button { width: auto; height: auto; min-width: 0; min-height: 44px; font-size: inherit; }
-.reproductive-system-settings select.text_pole { width: 100%; }
-.reproductive-system-settings :is(input[type="date"], input[type="text"], textarea) { min-width: 0; width: 100%; }
-.reproductive-system-settings input[type="number"] { min-width: 72px; }
-.reproductive-system-settings > .menu_button,
-.reproductive-system-settings > button { width: 100%; }
-.reproductive-system-settings #rp-open-profiles { background: var(--rp-accent-surface); border-color: var(--rp-accent); }
-.reproductive-system-settings hr { width: 100%; height: 0; margin: 4px 0; border: 0; border-top: 1px solid var(--rp-border); }
-.reproductive-system-settings :is(#repro-manual-panel, #repro-css-panel) {
-    padding: 14px; border: 1px solid var(--rp-border); border-radius: 14px;
-    background: var(--rp-paper); gap: 12px !important; min-width: 0;
+/* Reclaim fields from broad rules in custom SillyTavern themes. */
+#extensions_settings2 .reproductive-system-settings :is(select, .text_pole, input[type="date"], input[type="number"], input[type="text"], textarea) {
+    min-width: 0;
+    max-width: 100%;
+    min-height: 44px !important;
+    padding: 9px 12px !important;
+    background: var(--rp-input) !important;
+    border: 1px solid var(--rp-quiet-border) !important;
+    border-radius: 10px !important;
+    color: var(--rp-text) !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
 }
-.reproductive-system-settings :is(#repro-manual-panel, #repro-css-panel) > div { gap: 10px !important; flex-wrap: wrap; min-width: 0; }
-.reproductive-system-settings :is(#repro-manual-toggle, #repro-css-toggle, #repro-theme-btn) {
-    min-height: 44px; padding: 10px 12px !important; text-align: center; white-space: normal;
+#extensions_settings2 .reproductive-system-settings :is(button, .menu_button) {
+    min-width: 0;
+    min-height: 44px !important;
+    background: var(--rp-paper) !important;
+    border: 1px solid var(--rp-quiet-border) !important;
+    border-radius: 10px !important;
+    color: var(--rp-text) !important;
+    box-shadow: none !important;
+    filter: none !important;
+    opacity: 1 !important;
+    line-height: 1.45 !important;
+    padding: 10px 12px !important;
+    text-align: center;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+#extensions_settings2 .reproductive-system-settings :is(button, .menu_button):hover { background: var(--rp-hover) !important; border-color: var(--rp-accent) !important; }
+#extensions_settings2 .reproductive-system-settings :is(#rp-open-profiles, #repro-setcycle, #repro-partner-cycle-set, #repro-apply-weeks, #repro-css-apply) {
+    background: var(--rp-accent-surface) !important;
+    border-color: var(--rp-border) !important;
+}
+.reproductive-system-settings .rp-primary-fields .rp-field-stack {
+    display: flex !important;
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 6px !important;
+}
+.reproductive-system-settings :is(.rp-field-stack, .rp-form-row, .rp-cycle-edit, .rp-meta-options) :is(label, span) {
+    color: var(--rp-text) !important;
+    font-size: max(16px, var(--rp-reading-size)) !important;
+    opacity: 1 !important;
+}
+.reproductive-system-settings .rp-primary-fields select { width: 100%; }
+.reproductive-system-settings #rp-open-profiles { width: 100%; margin-top: 4px; }
+.reproductive-system-settings .rp-configuration { padding: 14px 0 0; border-top: 1px solid var(--rp-quiet-border); }
+.reproductive-system-settings .rp-controls-column > label.rp-switch { margin-top: 12px; }
+.reproductive-system-settings .rp-form-row {
+    display: flex;
+    align-items: center;
+    gap: 9px !important;
+    flex-wrap: wrap;
+}
+.reproductive-system-settings .rp-form-row > span:first-child {
+    flex: 0 1 42%;
+    min-width: 112px;
+    overflow-wrap: anywhere;
+}
+.reproductive-system-settings .rp-form-row > select { flex: 1 1 140px !important; width: 100%; }
+.reproductive-system-settings .rp-form-row > input { flex: 0 1 100px; }
+.reproductive-system-settings .rp-partner-editor { display: flex; align-items: stretch; flex-wrap: wrap; gap: 9px; }
+.reproductive-system-settings .rp-partner-editor > span { flex: 1 0 100%; }
+.reproductive-system-settings .rp-partner-editor > input { flex: 0 0 84px; }
+.reproductive-system-settings .rp-partner-editor > button { flex: 1 1 160px; }
+
+/* RIGHT — live cycle state, pregnancy, baby and partner monitors. */
+.reproductive-system-settings #repro-currentcycle {
+    padding: 11px 13px;
+    min-width: 0;
+    border: 1px solid var(--rp-quiet-border);
+    border-radius: 10px;
+    background: var(--rp-status-surface) !important;
+    color: var(--rp-text) !important;
+    overflow-wrap: anywhere;
+}
+.reproductive-system-settings .rp-cycle-edit { display: flex; align-items: center; gap: 10px !important; flex-wrap: wrap; }
+.reproductive-system-settings .rp-cycle-edit > span { flex: 0 0 auto; }
+.reproductive-system-settings .rp-cycle-edit > input { width: 84px !important; flex: 0 1 84px; }
+.reproductive-system-settings .rp-cycle-edit > button { flex: 1 1 145px; }
+.reproductive-system-settings .rp-status-line { padding: 10px 0 0; border-top: 1px solid var(--rp-quiet-border); font-size: max(16px, var(--rp-reading-size)) !important; opacity: 1 !important; font-weight: 600; }
+.reproductive-system-settings :is(.rp-theme-colour, #repro-status .rp-theme-colour) { color: var(--rp-accent) !important; }
+.reproductive-system-settings hr { width: 100%; height: 0; margin: 0; border: none; border-top: 1px solid var(--rp-quiet-border); }
+.reproductive-system-settings .rp-m {
+    min-width: 0;
+    margin: 0;
+    background: var(--rp-input) !important;
+    border: 1px solid var(--rp-quiet-border);
+    border-radius: 12px;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+}
+.reproductive-system-settings .rp-m-head {
+    padding: 12px 14px;
+    font-size: 1.08em;
+    font-weight: 700;
+    color: var(--rp-accent) !important;
+    background: var(--rp-accent-surface) !important;
+    border-bottom: 1px solid var(--rp-quiet-border);
+}
+.reproductive-system-settings .rp-m-progress { height: 4px; background: var(--rp-paper); }
+.reproductive-system-settings .rp-m-progress-fill { height: 100%; background: var(--rp-accent); transition: width .2s ease; }
+.reproductive-system-settings .rp-m-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; padding: 12px; }
+.reproductive-system-settings .rp-m-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 12px;
+    min-width: 0;
+    border: 1px solid var(--rp-quiet-border);
+    background: var(--rp-paper) !important;
+    border-radius: 9px;
+}
+.reproductive-system-settings .rp-m-lbl { font-size: max(16px, var(--rp-reading-size)) !important; overflow-wrap: anywhere; }
+.reproductive-system-settings .rp-m span { font-size: max(16px, var(--rp-reading-size)) !important; opacity: 1 !important; }
+.reproductive-system-settings .rp-m-val { font-weight: 700; overflow-wrap: anywhere; }
+.reproductive-system-settings .rp-m-hp-ok { color: var(--rp-accent) !important; }
+.reproductive-system-settings :is(.rp-m-hp-warn, .rp-m-hp-crit) { color: var(--rp-attention) !important; }
+.reproductive-system-settings .rp-m-warn { border-left: 3px solid var(--rp-attention); padding-left: 10px; }
+.reproductive-system-settings .rp-m-text { padding: 5px 14px 8px; }
+.reproductive-system-settings .rp-m-btn {
+    margin: 7px 12px 12px;
+    padding: 9px 12px;
+    min-height: 44px;
+    background: var(--rp-accent-surface) !important;
+    color: var(--rp-text) !important;
+    border: 1px solid var(--rp-quiet-border);
+    border-radius: 10px;
+}
+.reproductive-system-settings #repro-preg-mon > div[style*="display:flex"],
+.reproductive-system-settings #repro-partner-mon > div[style*="display:flex"] { gap: 9px !important; flex-wrap: wrap; padding-inline: 12px; }
+.reproductive-system-settings #repro-preg-mon > div[style*="display:flex"] > input { width: 72px !important; flex: 0 0 72px; }
+.reproductive-system-settings #repro-preg-mon > div[style*="display:flex"] > button { flex: 1 1 145px !important; }
+.reproductive-system-settings #repro-reanchor-btn { width: calc(100% - 24px); }
+
+/* Full-width action strip and advanced editors below the two columns. */
+.reproductive-system-settings .rp-bottom-actions { display: flex; flex-direction: column; gap: 12px; }
+.reproductive-system-settings .rp-action-pair { display: flex; align-items: stretch; gap: 10px; flex-wrap: wrap; }
+.reproductive-system-settings .rp-action-pair > button {
+    flex: 1 1 200px;
+    width: auto !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.reproductive-system-settings .rp-action-utilities { display: grid !important; grid-template-columns: 1fr 1fr 52px; gap: 10px !important; }
+.reproductive-system-settings .rp-action-utilities > div { flex: none !important; width: 100%; min-width: 0; }
+.reproductive-system-settings #repro-theme-btn { display: grid; place-items: center; }
+.reproductive-system-settings .rp-meta-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: start; }
+.reproductive-system-settings .rp-meta-options > .rp-form-row { min-height: 50px; }
+.reproductive-system-settings .rp-meta-options > label { min-height: 50px; }
+.reproductive-system-settings #repro-purge-tags { width: 100%; }
+.reproductive-system-settings #repro-stats { padding: 12px 3px 2px; border-top: 1px solid var(--rp-quiet-border); font-size: max(16px, var(--rp-reading-size)) !important; opacity: 1 !important; overflow-wrap: anywhere; }
+.reproductive-system-settings :is(#repro-manual-panel, #repro-css-panel) {
+    min-width: 0;
+    padding: 16px;
+    border: 1px solid var(--rp-quiet-border);
+    border-radius: 12px;
+    background: var(--rp-paper) !important;
+    gap: 12px !important;
+}
+.reproductive-system-settings :is(#repro-manual-panel, #repro-css-panel) > div { gap: 9px !important; flex-wrap: wrap; min-width: 0; }
+.reproductive-system-settings :is(#repro-manual-panel, #repro-css-panel) input,
+.reproductive-system-settings :is(#repro-manual-panel, #repro-css-panel) select { flex: 1 1 120px !important; min-width: 0 !important; }
+.reproductive-system-settings :is(#repro-manual-panel, #repro-css-panel) small {
+    font-size: max(16px, var(--rp-reading-size)) !important;
+    opacity: 1 !important;
+}
+.reproductive-system-settings #repro-custom-css {
+    width: 100%; min-height: 160px; padding: 12px; resize: vertical;
+    font-family: ui-monospace, Consolas, monospace !important;
+    white-space: pre; tab-size: 2;
 }
 .reproductive-system-settings .repro-button-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .reproductive-system-settings .rp-setting-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 6px 0; }
 .reproductive-system-settings .rp-setting-row :is(select, input) { flex: 1 1 160px; min-width: 0; }
-.reproductive-system-settings .rp-hygiene-button { white-space: normal; min-width: 44px; flex: 0 0 auto; }
-.reproductive-system-settings :is(small, span, label, p, input, select, textarea, button, div) { font-size: max(16px, var(--rp-reading-size)) !important; line-height: 1.6 !important; opacity: 1 !important; }
-.reproductive-system-settings .rp-cycle-info { padding: 12px; border: 1px solid var(--rp-border); background: var(--rp-paper); border-radius: 12px; }
-.reproductive-system-settings #repro-custom-css { width: 100%; min-height: 160px; font-size: 16px; line-height: 1.6; padding: 12px; resize: vertical; }
-.reproductive-system-settings #repro-stats { display: block; overflow-wrap: anywhere; }
-.reproductive-system-settings #repro-partner-cycle-row { flex-wrap: wrap; align-items: center; gap: 10px; }
-.reproductive-system-settings #repro-partner-cycle-row input { flex: 1 1 70px; }
-.reproductive-system-settings #repro-partner-cycle-row button { flex: 1 1 180px; }
-.reproductive-system-settings :is(#repro-manual-panel, #repro-css-panel) input,
-.reproductive-system-settings :is(#repro-manual-panel, #repro-css-panel) select { flex: 1 1 110px !important; width: auto !important; }
-
-/* Compact status monitors remain readable, even on touch devices. */
-.reproductive-system-settings .rp-m { margin: 0; overflow: hidden; border: 1px solid var(--rp-border); border-radius: 12px; background: var(--rp-paper); }
-.reproductive-system-settings .rp-m-head { padding: 12px 14px; font-weight: 700; border-bottom: 1px solid var(--rp-border); }
-.reproductive-system-settings .rp-m-head.pink,
-.reproductive-system-settings .rp-m-head.blue { color: var(--rp-text); }
-.reproductive-system-settings .rp-m-progress { height: 6px; background: var(--rp-input); }
-.reproductive-system-settings .rp-m-progress-fill { height: 100%; background: var(--rp-accent); transition: width .2s ease; }
-.reproductive-system-settings .rp-m-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 12px; }
-.reproductive-system-settings .rp-m-cell { display: flex; flex-direction: column; gap: 2px; min-width: 0; padding: 9px; border: 1px solid var(--rp-border); border-radius: 9px; }
-.reproductive-system-settings .rp-m-lbl { font-weight: 400; overflow-wrap: anywhere; }
-.reproductive-system-settings .rp-m-val { font-weight: 700; overflow-wrap: anywhere; }
-.reproductive-system-settings :is(.rp-m-hp-ok, .rp-m-hp-warn, .rp-m-hp-crit) { color: var(--rp-text); }
-.reproductive-system-settings .rp-m-hp-warn,
-.reproductive-system-settings .rp-m-hp-crit,
-.reproductive-system-settings .rp-m-warn { border-left: 3px solid var(--rp-attention); padding-left: 8px; }
-.reproductive-system-settings .rp-m-text { padding: 10px 14px; }
-.reproductive-system-settings .rp-m-btn { min-height: 44px; margin: 8px; padding: 10px 12px; background: var(--rp-accent-surface); color: var(--rp-text); border: 1px solid var(--rp-border); border-radius: 10px; }
+.reproductive-system-settings #repro-partner-cycle-row input { flex: 0 0 84px !important; }
+.reproductive-system-settings #repro-partner-cycle-row button { flex: 1 1 160px; }
 
 /* Modern detailed editor (dialog in reproductive-ui.js). */
 .rp-profile-dialog {
@@ -488,28 +662,35 @@ details.repro.repro-multi details.repro .repro-c { padding: 12px; }
 @keyframes rgPop { from { transform: scale(.97); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 @keyframes rgConfettiFall { to { transform: translateY(520px) rotate(720deg); opacity: 0; } }
 
+/* Container-based: the right-hand Tavern drawer may be narrow even on desktop. */
+@container (max-width: 760px) {
+    .reproductive-system-settings .rp-panel-layout { grid-template-columns: minmax(0,1fr); gap: 18px; }
+    .reproductive-system-settings .rp-controls-column { border: 0; padding: 0 0 17px; border-bottom: 1px solid var(--rp-quiet-border); }
+    .reproductive-system-settings .rp-meta-options { grid-template-columns: minmax(0,1fr); }
+}
+@container (max-width: 420px) {
+    .reproductive-system-settings .rp-action-utilities { grid-template-columns: minmax(0,1fr); }
+    .reproductive-system-settings .rp-form-row > span:first-child { flex: 1 0 100%; }
+    .reproductive-system-settings .rp-form-row > select { width: 100%; }
+    .reproductive-system-settings .rp-cycle-edit > span { flex: 0 0 100%; }
+    .reproductive-system-settings .rp-cycle-edit > button { flex: 1 1 160px; }
+}
+@container (max-width: 280px) {
+    .reproductive-system-settings .rp-m-grid { grid-template-columns: minmax(0,1fr); }
+    .reproductive-system-settings .rp-cycle-edit > input { flex: 1 0 100%; }
+    .reproductive-system-settings .rp-action-pair { flex-direction: column; }
+    .reproductive-system-settings .rp-action-pair > button { flex: 1 1 auto; }
+}
 @media (max-width: 700px) {
     .rp-profile-dialog { padding: 16px 12px; }
-    .rp-editor-grid { grid-template-columns: minmax(0, 1fr); }
+    .rp-editor-grid { grid-template-columns: minmax(0,1fr); }
     .rp-editor-aside { grid-row: auto; }
     .rp-section-body { padding: 10px 14px 16px; }
     .rp-paper > :is(h3, summary) { padding: 12px 14px; }
-    .reproductive-system-settings { grid-template-columns: minmax(0, 1fr); }
-    .reproductive-system-settings > div:has(> #repro-trackfor),
-    .reproductive-system-settings > div:has(> #repro-carrier-mode) { grid-column: 1; }
-    .reproductive-system-settings #repro-cycle-row,
-    .reproductive-system-settings #repro-partner-cycle-row,
-    .reproductive-system-settings #repro-manual-panel > div,
-    .reproductive-system-settings > div:has(> #repro-manual-toggle) { align-items: stretch !important; flex-direction: column !important; }
-    .reproductive-system-settings > div:has(> #repro-manual-toggle) > .menu_button { width: 100% !important; flex: 1 1 auto !important; }
-    .reproductive-system-settings :is(#repro-manual-panel, #repro-css-panel) > div > :is(select, input, button) { width: 100% !important; }
-    .reproductive-system-settings .rp-m-grid,
-    details.repro .repro-grid,
-    .rp-tree-bento, .rp-th-body { grid-template-columns: minmax(0, 1fr); }
     :is(#repro-birth-overlay, #rp-tree-overlay, #rp-quick-overlay, #rp-theme-overlay, .rg-overlay) { padding: 10px !important; }
     :is(.rb-dialog, .rp-tree-dialog, .rp-quick-dialog, .rp-th-dialog, .rg-card) { width: 100%; max-height: calc(100dvh - 20px); }
     .rp-tree-body, .rp-quick-body { padding: 12px; }
-    .rp-tree-canvas { overflow-x: hidden; }
+    .rp-tree-canvas { overflow-x: auto; }
     .rp-tree-rail { flex-direction: column; align-items: stretch; gap: 16px; }
     .rp-tree-union { width: 100%; }
     .rp-couple { flex-wrap: wrap; }
@@ -530,22 +711,4 @@ details.repro.repro-multi details.repro .repro-c { padding: 12px; }
     :is(.reproductive-system-settings, .rp-profile-dialog, details.repro, #repro-birth-overlay,
       #rp-tree-overlay, #rp-quick-overlay, #rp-theme-overlay, .rg-overlay, .custom-notification) *,
     .rg-confetti { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
-}
-
-/* Narrow extension sidebars on a wide desktop need the same uncluttered layout. */
-@container (max-width: 540px) {
-    .reproductive-system-settings > div:has(> #repro-trackfor),
-    .reproductive-system-settings > div:has(> #repro-carrier-mode) { grid-column: 1 / -1; }
-    .reproductive-system-settings #repro-cycle-row,
-    .reproductive-system-settings #repro-partner-cycle-row,
-    .reproductive-system-settings #repro-manual-panel > div,
-    .reproductive-system-settings > div:has(> #repro-manual-toggle) {
-        align-items: stretch !important;
-        flex-direction: column !important;
-    }
-    .reproductive-system-settings > div:has(> #repro-manual-toggle) > .menu_button {
-        width: 100% !important;
-        flex: 1 1 auto !important;
-    }
-    .reproductive-system-settings .rp-m-grid { grid-template-columns: minmax(0, 1fr); }
 }

@@ -1316,21 +1316,28 @@ export function setupUI() {
         const html = `
 <div class="inline-drawer">
     <div class="inline-drawer-toggle inline-drawer-header">
+        <span class="rp-header-symbol" aria-hidden="true">◉</span>
         <b>${L('title')}</b>
         <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
     </div>
     <div class="inline-drawer-content">
         <div class="reproductive-system-settings">
-            <label class="checkbox_label"><input type="checkbox" id="repro-enabled"><span>${L('enabled')}</span></label>
-            <label class="checkbox_label"><input type="checkbox" id="repro-notify"><span>${L('notifications')}</span></label>
-            <hr>
-            <div style="display:flex;gap:4px;align-items:center">
+            <div class="rp-panel-layout">
+                <section class="rp-controls-column" aria-label="Настройки отслеживания">
+                    <div class="rp-switches">
+            <label class="checkbox_label rp-switch"><input type="checkbox" id="repro-enabled"><span>${L('enabled')}</span></label>
+            <label class="checkbox_label rp-switch"><input type="checkbox" id="repro-notify"><span>${L('notifications')}</span></label>
+            <label class="checkbox_label rp-switch" title="Скрывать неподтверждённую беременность; учитывать тесты, раскрытие и факты текущей сцены"><input type="checkbox" id="repro-hidden-preg"><span>Скрытая беременность (тест)</span></label>
+
+                    </div>
+                    <div class="rp-primary-fields">
+                        <div class="rp-field-stack rp-track-select" style="display:flex;gap:4px;align-items:center">
                 <label for="repro-trackfor">Отслеживать:</label>
                 <select id="repro-trackfor" class="text_pole">
                     <option value="user">Меня</option><option value="char">Бота</option><option value="both">Обоих</option>
                 </select>
             </div>
-            <div style="display:flex;gap:4px;align-items:center">
+            <div class="rp-field-stack rp-carrier-select" style="display:flex;gap:4px;align-items:center">
                 <span>Вынашивание:</span>
                 <select id="repro-carrier-mode" class="text_pole">
                     <option value="user">Вынашиваю я</option>
@@ -1340,26 +1347,26 @@ export function setupUI() {
                 </select>
             </div>
             <button type="button" id="rp-open-profiles" class="menu_button">◷ Раса, цикл и беременность</button>
-            <div id="repro-partner-cycle-row">
+                    </div>
+            <div id="repro-partner-cycle-row" class="rp-partner-editor">
                 <span id="repro-partner-cycle-info"></span>
                 <input id="repro-partner-cycle-day" class="text_pole" type="number" min="1" max="${cycleLength(s,'char')}">
                 <button id="repro-partner-cycle-set" class="menu_button">Установить день бота</button>
             </div>
-            <hr>
-            <label class="checkbox_label" title="Скрывать неподтверждённую беременность; учитывать тесты, раскрытие и факты текущей сцены"><input type="checkbox" id="repro-hidden-preg"><span>Скрытая беременность (тест)</span></label>
-            <div id="repro-contraception-user-box" style="display:flex;gap:4px;align-items:center">
+            <div class="rp-configuration">
+            <div id="repro-contraception-user-box" class="rp-form-row" style="display:flex;gap:4px;align-items:center">
                 <span id="repro-contra-user-label" style="font-size:9px;opacity:0.5">Контрацепция {{user}}:</span>
                 <select id="repro-contraception-user" class="text_pole" style="flex:1">
                     <option value="none">Нет</option><option value="condom">Презерватив</option><option value="pill">Таблетки</option><option value="iud">ВМС</option>
                 </select>
             </div>
-            <div id="repro-contraception-char-box" style="display:none;gap:4px;align-items:center">
+            <div id="repro-contraception-char-box" class="rp-form-row" style="display:none;gap:4px;align-items:center">
                 <span id="repro-contra-char-label" style="font-size:9px;opacity:0.5">Контрацепция {{char}}:</span>
                 <select id="repro-contraception-char" class="text_pole" style="flex:1">
                     <option value="none">Нет</option><option value="condom">Презерватив</option><option value="pill">Таблетки</option><option value="iud">ВМС</option>
                 </select>
             </div>
-            <div style="display:flex;gap:4px;align-items:center">
+            <div class="rp-form-row" style="display:flex;gap:4px;align-items:center">
                 <span style="font-size:9px;opacity:0.5">Длит. берем.:</span>
                 <select id="repro-duration" class="text_pole" style="flex:1">
                     <option value="12">12 нед.</option><option value="16">16</option>
@@ -1370,7 +1377,7 @@ export function setupUI() {
                 </select>
                 <input type="number" id="repro-duration-custom" class="text_pole" style="width:45px;display:none" min="4" max="100">
             </div>
-            <div style="display:flex;gap:4px;align-items:center" title="После этого возраста ребёнок «выпускается» из инфоблока — остаётся в семье, но без отслеживания подгузников/кормления.">
+            <div class="rp-form-row" style="display:flex;gap:4px;align-items:center" title="После этого возраста ребёнок «выпускается» из инфоблока — остаётся в семье, но без отслеживания подгузников/кормления.">
                 <span style="font-size:9px;opacity:0.5">Малыш до:</span>
                 <select id="repro-baby-max-age" class="text_pole" style="flex:1">
                     <option value="180">6 мес.</option>
@@ -1381,27 +1388,37 @@ export function setupUI() {
                     <option value="0">Никогда (вручную)</option>
                 </select>
             </div>
-            <hr>
+            </div>
+            <label class="checkbox_label rp-switch" style="display:flex;gap:6px;align-items:center;font-size:10px;cursor:pointer" title="Цикл становится частью РП: гигиена и протечки в месячные, самочувствие по фазам, сбои цикла от стресса или болезни">
+                <input type="checkbox" id="repro-realism">
+                <span>Реализм цикла</span>
+            </label>
+                </section>
+                <section class="rp-status-column" aria-label="Текущее состояние">
             <div id="repro-currentcycle" class="rp-cycle-info"></div>
-            <div id="repro-cycle-row" style="display:flex;gap:4px;align-items:center">
+            <div id="repro-cycle-row" class="rp-cycle-edit" style="display:flex;gap:4px;align-items:center">
                 <span style="font-size:9px;opacity:0.5">День цикла:</span>
                 <input type="number" id="repro-cycleday" min="1" max="${cycleLength(s)}" value="${getCycleDay()}" class="text_pole" style="width:45px">
                 <button id="repro-setcycle" class="menu_button">${ic('fa-check')} Установить</button>
             </div>
             <hr>
-            <div style="font-size:10px;opacity:0.7">Статус: <span id="repro-status"></span></div>
+            <div class="rp-status-line" style="font-size:10px;opacity:0.7">Статус: <span id="repro-status"></span></div>
             <div id="repro-preg-mon" class="rp-m" style="display:none"></div>
             <div id="repro-partner-mon" class="rp-m" style="display:none"></div>
             <div id="repro-baby-mon" class="rp-m" style="display:none"></div>
+                </section>
+            </div>
+            <div class="rp-bottom-actions">
+                <div class="rp-action-pair">
             <button id="repro-family-tree-btn" class="menu_button" style="width:100%"><i class="fa-solid fa-people-roof" style="margin-right:6px"></i>Семейное древо</button>
             <button id="repro-force-birth-btn" class="menu_button" style="width:100%;display:none"><i class="fa-solid fa-baby" style="margin-right:6px"></i>Принять роды сейчас</button>
-            <hr>
-            <div style="display:flex;gap:4px;align-items:stretch">
+                </div>
+            <div class="rp-action-utilities" style="display:flex;gap:4px;align-items:stretch">
                 <div id="repro-manual-toggle" class="menu_button" style="flex:1;font-size:10px;text-align:center;cursor:pointer">Ручная беременность / малыш ▼</div>
                 <div id="repro-css-toggle" class="menu_button" style="flex:1;font-size:10px;text-align:center;cursor:pointer">CSS инфоблока ▼</div>
                 <div id="repro-theme-btn" class="menu_button" style="flex:0 0 auto;font-size:10px;padding:0 9px;text-align:center;cursor:pointer" title="Стиль"><i class="fa-solid fa-palette"></i></div>
             </div>
-            <div id="repro-manual-panel" style="display:none;gap:4px;flex-direction:column">
+            <div id="repro-manual-panel" class="rp-expanded-panel" style="display:none;gap:4px;flex-direction:column">
                 <small style="opacity:0.5;font-size:9px;font-weight:600">Беременность</small>
                 <div style="display:flex;gap:4px;align-items:center" id="repro-manual-who-row">
                     <span style="font-size:9px;opacity:0.5;min-width:62px">Носитель:</span>
@@ -1450,8 +1467,8 @@ export function setupUI() {
                 <button id="repro-reset-baby" class="menu_button redWarningBG" style="width:100%;display:none">Сброс малыша</button>
                 <button id="repro-undo" class="menu_button" style="width:100%">↶ Отменить последний сброс/удаление</button>
             </div>
-            <hr>
-            <div style="display:flex;gap:4px;align-items:center">
+            <div class="rp-meta-options">
+            <div class="rp-form-row" style="display:flex;gap:4px;align-items:center">
                 <span style="font-size:9px;opacity:0.5">Инфоблок:</span>
                 <select id="repro-infoblock" class="text_pole" style="flex:1">
                     <option value="off">Выкл.</option>
@@ -1459,16 +1476,13 @@ export function setupUI() {
                     <option value="bottom">Внизу</option>
                 </select>
             </div>
-            <label style="display:flex;gap:6px;align-items:center;font-size:10px;cursor:pointer">
+            <label class="checkbox_label rp-light-switch" style="display:flex;gap:6px;align-items:center;font-size:10px;cursor:pointer">
                 <input type="checkbox" id="repro-light-mode">
                 <span>Светлая тема</span>
             </label>
-            <label style="display:flex;gap:6px;align-items:center;font-size:10px;cursor:pointer" title="Цикл становится частью РП: гигиена и протечки в месячные, самочувствие по фазам, сбои цикла от стресса или болезни">
-                <input type="checkbox" id="repro-realism">
-                <span>Реализм цикла</span>
-            </label>
+            </div>
             <button id="repro-purge-tags" class="menu_button" style="width:100%;font-size:10px" title="Убрать технические теги из текста сообщений этого чата — модель перестанет их видеть">Вычистить теги из чата</button>
-            <div id="repro-css-panel" style="display:none;flex-direction:column;gap:4px">
+            <div id="repro-css-panel" class="rp-expanded-panel" style="display:none;flex-direction:column;gap:4px">
                 <textarea id="repro-custom-css" class="text_pole" rows="10" style="font-family:monospace;font-size:10px;resize:vertical;min-height:80px;white-space:pre;tab-size:2" placeholder="/* Свой CSS для инфоблока */\ndetails.repro { ... }"></textarea>
                 <div style="display:flex;gap:4px">
                     <button id="repro-css-apply" class="menu_button" style="flex:1">Применить</button>
@@ -1476,8 +1490,8 @@ export function setupUI() {
                 </div>
                 <small style="opacity:0.35;font-size:8px">Селекторы: details.repro, .repro-header, .repro-c, .repro-stat, .rp-val, .repro-bar-fill и др. Правила отсюда сильнее выбранного стиля.</small>
             </div>
-            <hr>
             <small id="repro-stats" style="opacity:0.3;font-size:8px">0 / 0</small>
+            </div>
         </div>
     </div>
 </div>`;
