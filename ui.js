@@ -1149,13 +1149,13 @@ export function syncUI() {
                 <div class="rp-m-text"><b>Симптомы:</b> ${symptoms}</div>
                 <div class="rp-m-text"><b>Рек-ции:</b> ${recs}</div>
                 ${compsHtml}
-                <div style="display:flex;gap:4px;align-items:center;margin-top:6px">
-                    <span style="font-size:9px;opacity:0.5">Срок:</span>
+                <div class="rp-m-weeks-row">
+                    <span class="rp-m-inline-label">Срок:</span>
                     <input type="number" id="repro-set-weeks" min="1" max="42" value="${weeks}" class="text_pole" style="width:50px">
-                    <span style="font-size:9px;opacity:0.5">нед.</span>
-                    <button id="repro-apply-weeks" class="rp-m-btn" style="flex:1">Установить</button>
+                    <span class="rp-m-inline-suffix">нед.</span>
+                    <button id="repro-apply-weeks" class="rp-m-btn rp-m-btn-primary">Установить</button>
                 </div>
-                <button id="repro-reanchor-btn" class="rp-m-btn" style="margin-top:6px">Пересчитать недели от RP-даты</button>`;
+                <button id="repro-reanchor-btn" class="rp-m-btn rp-m-btn-block">Пересчитать недели от RP-даты</button>`;
 
             setTimeout(() => {
                 const db = el('repro-doctor-btn'); if (db) db.onclick = visitDoctor;
@@ -1327,8 +1327,6 @@ export function setupUI() {
                     <div class="rp-switches">
             <label class="checkbox_label rp-switch"><input type="checkbox" id="repro-enabled"><span>${L('enabled')}</span></label>
             <label class="checkbox_label rp-switch"><input type="checkbox" id="repro-notify"><span>${L('notifications')}</span></label>
-            <label class="checkbox_label rp-switch" title="Скрывать неподтверждённую беременность; учитывать тесты, раскрытие и факты текущей сцены"><input type="checkbox" id="repro-hidden-preg"><span>Скрытая беременность (тест)</span></label>
-
                     </div>
                     <div class="rp-primary-fields">
                         <div class="rp-field-stack rp-track-select" style="display:flex;gap:4px;align-items:center">
@@ -1347,6 +1345,7 @@ export function setupUI() {
                 </select>
             </div>
             <button type="button" id="rp-open-profiles" class="menu_button">◷ Раса, цикл и беременность</button>
+            <label class="checkbox_label rp-switch rp-secondary-switch" title="Скрывать неподтверждённую беременность; учитывать тесты, раскрытие и факты текущей сцены"><input type="checkbox" id="repro-hidden-preg"><span>Скрытая беременность (тест)</span></label>
                     </div>
             <div id="repro-partner-cycle-row" class="rp-partner-editor">
                 <span id="repro-partner-cycle-info"></span>
@@ -1416,7 +1415,7 @@ export function setupUI() {
             <div class="rp-action-utilities" style="display:flex;gap:4px;align-items:stretch">
                 <div id="repro-manual-toggle" class="menu_button" style="flex:1;font-size:10px;text-align:center;cursor:pointer">Ручная беременность / малыш ▼</div>
                 <div id="repro-css-toggle" class="menu_button" style="flex:1;font-size:10px;text-align:center;cursor:pointer">CSS инфоблока ▼</div>
-                <div id="repro-theme-btn" class="menu_button" style="flex:0 0 auto;font-size:10px;padding:0 9px;text-align:center;cursor:pointer" title="Стиль"><i class="fa-solid fa-palette"></i></div>
+                <div id="repro-theme-btn" class="menu_button" style="flex:0 0 auto;font-size:10px;padding:0 9px;text-align:center;cursor:pointer" title="Стиль"><span class="rp-theme-glyph" aria-hidden="true">◌</span></div>
             </div>
             <div id="repro-manual-panel" class="rp-expanded-panel" style="display:none;gap:4px;flex-direction:column">
                 <small style="opacity:0.5;font-size:9px;font-weight:600">Беременность</small>
