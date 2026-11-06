@@ -190,6 +190,11 @@ export function applyScanResult(result) {
         const babySex = p.fetusSex.length > 0 ? [...p.fetusSex] : ['M'];
         const newBabyCount = p.fetusCount || 1;
         const birthRpDate = resolveBirthRpDate(p, p, s, birthSource);
+        const birthPaternity = {
+            paternityCandidates: structuredClone(p.paternityCandidates || []),
+            dnaResult: p.dnaResult ? structuredClone(p.dnaResult) : null,
+            _secondParentManual: !!p._secondParentManual,
+        };
 
         // ── Сохраняем существующих детей (если они уже есть от предыдущих родов) ──
         const existingBabies = Array.isArray(p.babies) ? [...p.babies] : [];
@@ -272,6 +277,7 @@ export function applyScanResult(result) {
                 fatherName: p.fatherName || '',
                 motherName: birthParentName,
                 bornBy: 'user',
+                ...structuredClone(birthPaternity),
                 birthRpDate: birthRpDate,  // для расчёта возраста в днях
                 age: 'новорождённый',
             });
@@ -763,6 +769,8 @@ export function startManualPregnancy(conceptionDateISO, fetusCount, fetusSex = n
     }
     p.isPregnant = true; p._care = null; p._pregnancySequence=(p._pregnancySequence||0)+1; p.complications=[]; p.healthStatus='normal'; p.fetusSexRevealed=false;
     p._manualPregnancy = true;
+    p._manualTermSet = false;
+    p.dnaResult = null;
     p.pregnancyKnown = false;
     p.lastTestResult = null;
     p.testTakenAt = null;
@@ -1005,7 +1013,7 @@ export function partnerCheckConception() {
         c.fetusSex = [];
         for (let i = 0; i < c.fetusCount; i++) c.fetusSex.push(roll(2) === 1 ? 'M' : 'F');
         c.fetusSexRevealed = false;
-        if (!c._secondParentManual && !c.fatherName) c.fatherName = carrierName('user');
+        if (!s.narratorMode && !getPregnancyData().narratorMode && !c._secondParentManual && !c.fatherName) c.fatherName = carrierName('user');
         if (s.showNotifications) {
             showNotification(`<i class="fa-solid fa-check"></i> ${carrierName('char')} беременна! ${formatFetusCount(c.fetusCount)}`, 'success');
         }
@@ -1031,7 +1039,12 @@ export function partnerBirth(babyTraits, options = {}) {
     const sexes = c.fetusSex?.length ? [...c.fetusSex] : ['M'];
     const birthRpDate = resolveBirthRpDate(c, p, s, birthSource);
     const motherName = carrierName('char');
-    const fatherName = c._secondParentManual ? c.fatherName : c.fatherName || carrierName('user');
+    const fatherName = c._secondParentManual ? c.fatherName : c.fatherName || (p.narratorMode ? '' : carrierName('user'));
+    const birthPaternity = {
+        paternityCandidates: structuredClone(c.paternityCandidates || []),
+        dnaResult: c.dnaResult ? structuredClone(c.dnaResult) : null,
+        _secondParentManual: !!c._secondParentManual,
+    };
 
     // Сброс беременности партнёра
     c.isPregnant = false;
@@ -1055,6 +1068,7 @@ export function partnerBirth(babyTraits, options = {}) {
             diaperClean: true, teething: false, colicky: false, feedingType: '',
             milestones: [], personality: [], appearance: newbornLooks[i],
             fatherName, motherName, bornBy: 'char',
+            ...structuredClone(birthPaternity),
             birthRpDate, age: 'новорождённый',
         });
     }
@@ -1140,6 +1154,8 @@ export function startPartnerPregnancy(conceptionDateISO, fetusCount, fetusSex = 
     }
     c.isPregnant = true; c._care = null; c._pregnancySequence=(c._pregnancySequence||0)+1;
     c._manualPregnancy = true;
+    c._manualTermSet = false;
+    c.dnaResult = null;
     c.pregnancyKnown = false;
     c.lastTestResult = null;
     c.testTakenAt = null;
@@ -1154,7 +1170,7 @@ export function startPartnerPregnancy(conceptionDateISO, fetusCount, fetusSex = 
         ? [...fetusSex]
         : Array.from({ length: count }, () => (roll(2) === 1 ? 'M' : 'F'));
     c.fetusSexRevealed = false;
-    if (!c._secondParentManual && !c.fatherName) c.fatherName = carrierName('user');
+    if (!s.narratorMode && !getPregnancyData().narratorMode && !c._secondParentManual && !c.fatherName) c.fatherName = carrierName('user');
     c.pregnancyWeeks = p.rpDate ? calculateWeeksFromDates(c.conceptionDate, p.rpDate, 0).weeks : 0;
 
     refreshSnap();
@@ -1215,11 +1231,10 @@ export function takePregnancyTest(who = 'user') {
     const c = who === 'char' ? getPartnerData() : p;
 
     const days = daysSinceConception(c, p);
-    // Ручная беременность: введённый срок — подтверждённый пользователем
-    // сюжетный факт. Если срок строго больше двух недель, тест положительный
-    // даже без RP_DATE, и случайный бросок его не опровергает.
-    // Автоматические беременности по-прежнему используют rollTest.
-    const result = c.isPregnant && c._manualPregnancy === true && Number(c.pregnancyWeeks) > 2
+    // Ручное указание беременности или срока — подтверждённый сюжетный факт.
+    // С двух полных недель включительно тест положительный без случайного броска,
+    // даже без RP_DATE. Автоматический сценарий сохраняет обычный rollTest.
+    const result = c.isPregnant && (c._manualPregnancy === true || c._manualTermSet === true) && Number(c.pregnancyWeeks) >= 2
         ? 'positive' : rollTest(!!c.isPregnant, days);
 
     c.lastTestResult = result;

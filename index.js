@@ -12,7 +12,7 @@ import { initCustomNotifications } from './notifications.js';
 import { setSyncUI, setUpdatePromptInjection, setRenderInfoblock } from './pregnancy.js';
 import { updatePromptInjection } from './prompts.js';
 import { syncUI, setupUI } from './ui.js';
-import { onMessageReceived, onMessageSent, renderInfoblock, markRegeneration, prepareGeneration, processDateTag, rescanMessage, rollbackToPosition, clearRegenState, detachTags, rawTextOf, prepareTrackerOutput, filterTrackerContext } from './message-handler.js';
+import { onMessageReceived, onMessageSent, renderInfoblock, scheduleInfoblockRender, markRegeneration, prepareGeneration, processDateTag, rescanMessage, rollbackToPosition, clearRegenState, detachTags, rawTextOf, prepareTrackerOutput, filterTrackerContext } from './message-handler.js';
 import { stripHiddenTags, scanFullHistory } from './scanner.js';
 
 window.reproductiveSystemContextFilter = filterTrackerContext;
@@ -176,7 +176,7 @@ async function maybeBootstrapFromHistory() {
         saveSettingsDebounced();
         syncUI();
         updatePromptInjection();
-        setTimeout(renderInfoblock, 300);
+        scheduleInfoblockRender(300);
     } catch (e) { /* ignore */ } finally {
         _bootstrapRunning = false;
     }
@@ -202,6 +202,7 @@ jQuery(async () => {
         // ── Финальный скан, рендер инфоблока и скрытие тегов ──
         // rescanStatusOnly идемпотентно перечитывает RP_STATUS с полного текста.
         const finalStatusSeen = new WeakMap();
+        let generationActive = false;
         const processFinalMessage = (messageIndex) => {
             try {
                 const context = SillyTavern.getContext();
@@ -212,7 +213,7 @@ jQuery(async () => {
                 }
                 const msg = context.chat[idx];
                 if (!msg || !msg.mes || msg.is_user) {
-                    setTimeout(renderInfoblock, 200);
+                    scheduleInfoblockRender(200);
                     return;
                 }
                 // Сканируем до вырезания тегов: после этого RP_STATUS
@@ -254,7 +255,7 @@ jQuery(async () => {
                     }
                 }
             } catch (e) { /* ignore */ }
-            setTimeout(renderInfoblock, 300);
+            scheduleInfoblockRender(300);
         };
 
         // Fallback: рендер инфоблока + скрытие тегов после отрисовки сообщения (НЕ-streaming)
@@ -266,6 +267,7 @@ jQuery(async () => {
         // Сканируем ДО processFinalMessage: стрип вырезает теги из msg.mes.
         if (event_types.GENERATION_ENDED) {
             eventSource.on(event_types.GENERATION_ENDED, (messageIndex) => {
+                generationActive = false;
                 // 1) Скан полного текста (пока теги ещё на месте)
                 try { onMessageReceived(messageIndex, 'final'); } catch (e) {}
                 // 2) Потом чистим теги и рендерим инфоблок
@@ -278,7 +280,7 @@ jQuery(async () => {
         eventSource.on(event_types.MESSAGE_SENT, (messageIndex, type) => {
             updatePromptInjection();
             onMessageSent(messageIndex, type);
-            setTimeout(renderInfoblock, 500);
+            scheduleInfoblockRender(500);
         });
 
         // Regeneration / swipe — mark so time doesn't double-count
@@ -291,6 +293,7 @@ jQuery(async () => {
             // GENERATION_STARTED стреляет ДО добавления юзерского сообщения в чат,
             // поэтому реген определяем по ЯВНОМУ типу генерации из первого аргумента.
             eventSource.on(event_types.GENERATION_STARTED, (genType, params, dryRun) => {
+                generationActive = !dryRun;
                 prepareGeneration(genType, dryRun);
             });
         }
@@ -298,12 +301,12 @@ jQuery(async () => {
         // Re-render infoblock after message edit/swipe
         if (event_types.MESSAGE_EDITED) {
             eventSource.on(event_types.MESSAGE_EDITED, () => {
-                setTimeout(renderInfoblock, 400);
+                scheduleInfoblockRender(400);
             });
         }
         if (event_types.MESSAGE_UPDATED) {
             eventSource.on(event_types.MESSAGE_UPDATED, () => {
-                setTimeout(renderInfoblock, 400);
+                scheduleInfoblockRender(400);
             });
         }
 
@@ -412,49 +415,34 @@ jQuery(async () => {
                 saveSettingsDebounced();
                 syncUI();
                 updatePromptInjection();
-                setTimeout(renderInfoblock, 300);
+                scheduleInfoblockRender(300);
             });
         }
 
-        // ── MutationObserver: re-insert infoblock if ST removes it during re-render ──
-        // Continue/edit/swipe rebuild .mes_text, wiping our injected element.
-        // Watch the chat container and re-render when the last bot message changes.
+        // Restore only when the infoblock or whole message node was removed,
+        // not for every text-node mutation during streaming. Batch all triggers.
         try {
             const chatEl = document.getElementById('chat');
             if (chatEl) {
-                let pending = false;
-                const reinsert = () => {
-                    if (pending) return;
-                    pending = true;
-                    setTimeout(() => {
-                        pending = false;
-                        try {
-                            // Only re-insert if our block is missing from the last bot message
-                            const all = document.querySelectorAll('.mes:not([is_system="true"])');
-                            let lastBot = null;
-                            for (let i = all.length - 1; i >= 0; i--) {
-                                if (all[i].getAttribute('is_user') === 'false' && !all[i].classList.contains('gp-sms-hidden')) { lastBot = all[i]; break; }
-                            }
-                            if (!lastBot) return;
-                            if (!lastBot.querySelector('.rp-infoblock-inserted')) {
-                                renderInfoblock();
-                            }
-                        } catch (e) { /* ignore */ }
-                    }, 150);
-                };
                 const observer = new MutationObserver((mutations) => {
+                    if (generationActive) return;
                     const s = getSettings();
                     if (!s.isEnabled || !s.infoblockPosition || s.infoblockPosition === 'off') return;
                     for (const m of mutations) {
-                        // Watch for child changes inside .mes_text and new messages added
-                        if (m.target && (m.target.classList?.contains('mes_text') || m.target.classList?.contains('mes'))) {
-                            reinsert();
-                            return;
+                        if (m.type !== 'childList') continue;
+                        for (const removed of m.removedNodes) {
+                            if (removed.nodeType !== 1) continue;
+                            if (removed.matches?.('.rp-infoblock-inserted, .mes') ||
+                                removed.querySelector?.('.rp-infoblock-inserted')) {
+                                scheduleInfoblockRender(220);
+                                return;
+                            }
                         }
-                        // Also re-insert when nodes are removed (our block got wiped)
-                        for (const n of m.removedNodes || []) {
-                            if (n.classList?.contains('rp-infoblock-inserted')) {
-                                reinsert();
+                        // Only entire message insertion can change the target message;
+                        // the regular message-rendered hook handles content edits.
+                        for (const added of m.addedNodes) {
+                            if (added.nodeType === 1 && added.matches?.('.mes')) {
+                                scheduleInfoblockRender(220);
                                 return;
                             }
                         }
@@ -462,7 +450,7 @@ jQuery(async () => {
                 });
                 observer.observe(chatEl, { childList: true, subtree: true });
             }
-        } catch (e) { /* ignore */ }
+        } catch (e) { /* MutationObserver unavailable or chat not mounted */ }
 
     } catch (error) {
         reportError('[Reproductive] FATAL ERROR:', error);

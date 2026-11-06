@@ -38,7 +38,7 @@ export function settingsMarkup(s,c,who='user',names=['Персона','Перс�
         </details>
         <p class="rp-hint" data-tag-warning="${kind}">${v.tags.length>5?'Больше пяти проявлений: часть может теряться в отыгрыше.':'Модель использует 1–2 проявления по ситуации.'}</p>
     </div></details>`;};
-    return `<div class="rp-editor-head"><div><p class="rp-eyebrow">REPRODUCTIVE · 4.0.1</p><h2>Особенности персонажей</h2><p>Здесь задаются правила организма. Это не заменяет факты и решения персонажей.</p></div><button type="button" data-close aria-label="Закрыть настройки">×</button></div>
+    return `<div class="rp-editor-head"><div><p class="rp-eyebrow">REPRODUCTIVE · 4.0.2</p><h2>Особенности персонажей</h2><p>Здесь задаются правила организма. Это не заменяет факты и решения персонажей.</p></div><button type="button" data-close aria-label="Закрыть настройки">×</button></div>
     <nav class="rp-persons" aria-label="Настройки участника">${names.map((n,i)=>`<button type="button" data-who="${i?'char':'user'}" aria-pressed="${who===(i?'char':'user')}">${i?'◇':'○'} ${esc(n)}</button>`).join('')}</nav>
     <details class="rp-editor-guide"><summary>Нужна помощь с настройкой?</summary>
         <p>Сначала выбери участника сверху и укажи тип цикла. Стандартные значения можно не менять. Течка, гон, осложнения и их вероятности — дополнительные возможности для особых сюжетов.</p>
@@ -47,6 +47,7 @@ export function settingsMarkup(s,c,who='user',names=['Персона','Перс�
     <div class="rp-editor-grid"><div class="rp-editor-main">
     <section class="rp-paper"><h3><span aria-hidden="true">◷</span> Организм и цикл</h3><div class="rp-section-body">
     ${field('race','Вид персонажа',p.race,'text','placeholder="Например, человек"')}
+    ${select('reproductiveRole','Участие в зачатии',p.reproductiveRole,[['auto','По настройкам вынашивания'],['carry','Только вынашивает'],['fertilize','Только оплодотворяет'],['both','Может и вынашивать, и оплодотворять'],['none','Не участвует в зачатии']])}
     ${select('cycleType','Как устроен цикл?',p.cycleType,[['menstrual','С менструацией'],['silent','Без кровотечения'],['heat','С течкой'],['none','Без цикла']])}
     ${field('cycleLength','Длительность цикла (дней в сюжете)',p.cycleLength,'number',`min="2" max="10000" ${p.cycleType==='none'?'disabled':''}`)}
     <div class="rp-presets" data-cycle>${[21,28,30,35].map(n=>`<button type="button" data-days="${n}">${n} дн.</button>`).join('')}</div>
@@ -69,7 +70,7 @@ export function settingsMarkup(s,c,who='user',names=['Персона','Перс�
         <p class="rp-editor-feedback" data-feedback="complication" role="status"></p>
     </div>
     <details class="rp-raw-editor"><summary>Расширенный текстовый ввод</summary><label class="rp-field"><span>Пример: Сильный токсикоз | тошнота | 1,2</span><textarea data-custom-complications rows="5" placeholder="Название | Проявления | 1,2,3">${esc(p.customComplications.map(x=>`${x.name} | ${x.description} | ${x.stages.join(',')}`).join('\n'))}</textarea></label></details>
-    <details><summary>Стандартный список · ${catalog.length} варианта</summary><ul>${catalog.map(x=>`<li><label class="rp-check"><input type="checkbox" data-catalog="${x.id}" ${!(p.disabledComplications||[]).includes(x.id)?'checked':''}><strong>${x.name}</strong></label> · ${x.stages.join(', ')} триместр<br>${x.description}</li>`).join('')}</ul></details>
+    <details data-rp-catalog><summary>Стандартный список · ${catalog.length} варианта</summary><ul data-rp-catalog-list></ul></details>
     <details><summary>Шансы осложнений · для опытных</summary><p class="rp-hint">Игровые шансы, не медицинская статистика. Второй бросок только после первого успеха, третий — после второго.</p>${(s.complicationChances||[30,15,1]).map((v,i)=>field('chance'+i,`Осложнение ${i+1} · %`,v,'number','min="0" max="100"')).join('')}</details>
     </div></details></div>
     <aside class="rp-editor-aside"><section class="rp-paper"><h3>♡ Беременность</h3><div class="rp-section-body">
@@ -91,6 +92,25 @@ export function openReproductiveSettings(initialWho='user') {
     let who=initialWho;
     const refresh=()=>{dialog.innerHTML=settingsMarkup(getSettings(),getCarrier(who),who,[carrierName('user'),carrierName('char')]);document.documentElement.style.setProperty('--rp-reading-size',(getSettings().readingSize||16)+'px');};
     const persist=()=>{refreshRegenSnapshot();saveSettingsDebounced();syncUI();updatePromptInjection();};
+    // Lazy-create the detailed complication catalog only when it is expanded.
+    // The normal dialog opens quickly even when the player has a long history.
+    dialog.addEventListener('toggle', e => {
+        const details = e.target;
+        if (!details?.matches?.('details[data-rp-catalog]') || !details.open || details.dataset.rendered) return;
+        const list = details.querySelector('[data-rp-catalog-list]');
+        if (!list) return;
+        const disabled = profile(getSettings(),who).disabledComplications || [];
+        const frag = document.createDocumentFragment();
+        for (const x of catalog) {
+            const li=document.createElement('li'), label=document.createElement('label'),input=document.createElement('input'),strong=document.createElement('strong');
+            label.className='rp-check';input.type='checkbox';input.dataset.catalog=x.id;input.checked=!disabled.includes(x.id);
+            strong.textContent=x.name;label.append(input,strong);
+            li.append(label,document.createTextNode(` · ${x.stages.join(', ')} триместр`),document.createElement('br'),document.createTextNode(x.description));
+            frag.append(li);
+        }
+        list.append(frag);
+        details.dataset.rendered='true';
+    }, true);
     dialog.addEventListener('click',e=>{
         const b=e.target.closest('button');if(!b)return;
         if(b.hasAttribute('data-close')){dialog.close();return;}

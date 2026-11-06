@@ -598,7 +598,9 @@ export async function scanFullHistory() {
     createUndoCheckpoint('Полное пересканирование чата');
     const savedUserPregnancy = p.isPregnant ? structuredClone({
         isPregnant: p.isPregnant, conceptionDate: p.conceptionDate, pregnancyWeeks: p.pregnancyWeeks,
-        _manualPregnancy: p._manualPregnancy,
+        _manualPregnancy: p._manualPregnancy, _manualTermSet: p._manualTermSet,
+        paternityCandidates:p.paternityCandidates, dnaResult:p.dnaResult, gestationType:p.gestationType,
+        _secondParentManual:p._secondParentManual,
         _conceptionAnchored: p._conceptionAnchored, fetusCount: p.fetusCount, fetusSex: p.fetusSex,
         fetusSexRevealed: p.fetusSexRevealed, complications: p.complications, _plannedComplications: p._plannedComplications,
         healthStatus: p.healthStatus, pregnancyKnown: p.pregnancyKnown, testTakenAt: p.testTakenAt,
@@ -606,6 +608,10 @@ export async function scanFullHistory() {
         weightGain: p.weightGain, babyActivity: p.babyActivity, _care:p._care, _pregnancySequence:p._pregnancySequence,
     }) : null;
     const savedPartner = p.partner ? structuredClone(p.partner) : null;
+    const savedNarratorMode = !!p.narratorMode;
+    const savedNarratorParticipants = structuredClone(p.narratorParticipants || []);
+    const savedPaternityCandidates = structuredClone(p.paternityCandidates || []);
+    const savedGestationType = p.gestationType || 'uterine';
     const savedGrown = Array.isArray(p.grownChildren) ? [...p.grownChildren] : [];
     const savedBabyState = p.hasBaby ? {
         hasBaby: true,
@@ -630,6 +636,10 @@ export async function scanFullHistory() {
     Object.assign(p, structuredClone(defaultPregnancyData));
     if (undoSnapshot) p._undoSnapshot = undoSnapshot;
     p.grownChildren = savedGrown;
+    p.narratorMode = savedNarratorMode;
+    p.narratorParticipants = savedNarratorParticipants;
+    p.paternityCandidates = savedPaternityCandidates;
+    p.gestationType = savedGestationType;
     // cycleDay начинаем с 14 (овуляция) как нейтрального дефолта — модель его передвинет
     setCycleDay(14, false);
 

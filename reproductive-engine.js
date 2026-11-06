@@ -1,7 +1,7 @@
 // Pure game rules. All durations use story days; no wall-clock advancement.
 export const clamp = (v, lo, hi, fallback = lo) => Math.max(lo, Math.min(hi, Number.isFinite(Number(v)) ? Number(v) : fallback));
 export const profileDefaults = () => ({race:'', cycleType:'menstrual', cycleLength:28, periodDays:5,
-    compatible:true, health:'', humanComplications:true, customComplications:[], disabledComplications:[],
+    compatible:true, reproductiveRole:'auto', health:'', humanComplications:true, customComplications:[], disabledComplications:[],
     heat:{enabled:false,mode:'cycle',start:12,duration:3,date:'',chance:90,outside:0,tags:[]},
     rut:{enabled:false,mode:'cycle',start:12,duration:3,date:'',chance:90,multiplier:2,chanceMode:'multiply',tags:[]}});
 export function customComplicationId(name) {
@@ -16,6 +16,7 @@ export function profile(s, who = 'user') {
     if (!['menstrual','silent','heat','none'].includes(p.cycleType)) p.cycleType = 'menstrual';
     p.cycleLength = Math.round(clamp(p.cycleLength,2,10000,28));
     p.periodDays = Math.round(clamp(p.periodDays,0,p.cycleLength-1,5));
+    if (!['auto','carry','fertilize','both','none'].includes(p.reproductiveRole)) p.reproductiveRole='auto';
     p.race = typeof p.race === 'string' ? p.race.trim() : '';
     p.health = typeof p.health === 'string' ? p.health.trim() : '';
     p.disabledComplications = Array.isArray(p.disabledComplications) ? p.disabledComplications : [];
@@ -70,6 +71,9 @@ export function phase(s,who,day,rpDate,lang='ru') {
 export function conceptionChance(s,who,day,rpDate,partnerDay=1, partnerCycling=true) {
     const p=profile(s,who), other=profile(s,who==='user'?'char':'user');
     if (!p.compatible || !other.compatible) return 0;
+    // 'carry' and 'none' explicitly rule out fertilizing; 'auto' preserves old saves.
+    if (p.reproductiveRole === 'fertilize' || p.reproductiveRole === 'none' ||
+        other.reproductiveRole === 'carry' || other.reproductiveRole === 'none') return 0;
     let chance;
     const h=activePeriod(p,'heat',day,rpDate), configured=p.heat.enabled||p.cycleType==='heat';
     if (configured) chance=h===true?p.heat.chance:p.heat.outside;

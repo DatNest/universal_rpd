@@ -1,6 +1,7 @@
 import {cycleLength,profile,phase,care,termInfo,bodyDay} from './reproductive-engine.js';
 import {openReproductiveSettings} from './reproductive-ui.js';
 import {installInterfaceHelp} from './interface-help.js';
+import { addParticipant, addContact, normalizeParticipant, performNarrativeDNA, dnaProcedure } from './narrator.js';
 import { setManualCycleDay, setManualPregnancyWeeks, setSecondParent } from './message-handler.js';
 import { reportError } from './diagnostics.js';
 function cycleSummary(who, c, s) {
@@ -994,8 +995,20 @@ export function showQuickBar() {
     });
 }
 
+// Avoid re-parsing large cards unless their actual HTML has changed.
+function setMonitorHtml(node, html) {
+    if (!node) return false;
+    if (node._reproMarkup === html && node.childElementCount) return false;
+    node.innerHTML = html;
+    node._reproMarkup = html;
+    return true;
+}
+
 // ── syncUI ──
 export function syncUI() {
+    const panel = document.querySelector('#extensions_settings2 .reproductive-system-settings');
+    // State is still updated by the engine; do not paint a collapsed settings drawer.
+    if (panel && panel.getClientRects && !panel.getClientRects().length) return;
     const s = getSettings();
     const p = getPregnancyData();
 
@@ -1103,7 +1116,7 @@ export function syncUI() {
     const pregMon = el('repro-preg-mon');
     if (pregMon) {
         if(p.isPregnant && (care(p).maternalDeath || ['loss','frozen'].includes(care(p).event))){
-            pregMon.style.display='block';pregMon.innerHTML=esc(care(p).result || cycleSummary('user',p,s));
+            pregMon.style.display='block';setMonitorHtml(pregMon, esc(care(p).result || cycleSummary('user',p,s)));
         } else if (p.isPregnant && (p.pregnancyWeeks > 0 || p.conceptionDate)) {
             pregMon.style.display = 'block';
             const dur = s.pregnancyDuration || 40;
@@ -1137,7 +1150,7 @@ export function syncUI() {
                 }
             }
 
-            pregMon.innerHTML = `
+            const monitorChanged = setMonitorHtml(pregMon, `
                 <div class="rp-m-head pink">Беременность — ${weeks}/${dur} нед.</div>
                 <div class="rp-m-progress"><div class="rp-m-progress-fill pink" style="width:${pct}%"></div></div>
                 <div class="rp-m-grid">
@@ -1157,9 +1170,9 @@ export function syncUI() {
                     <span class="rp-m-inline-suffix">нед.</span>
                     <button id="repro-apply-weeks" class="rp-m-btn rp-m-btn-primary">Установить</button>
                 </div>
-                <button id="repro-reanchor-btn" class="rp-m-btn rp-m-btn-block">Пересчитать недели от RP-даты</button>`;
+                <button id="repro-reanchor-btn" class="rp-m-btn rp-m-btn-block">Пересчитать недели от RP-даты</button>`);
 
-            setTimeout(() => {
+            if (monitorChanged) setTimeout(() => {
                 const db = el('repro-doctor-btn'); if (db) db.onclick = visitDoctor;
                 const rb = el('repro-reanchor-btn');
                 if (rb) rb.onclick = () => {
@@ -1213,7 +1226,7 @@ export function syncUI() {
     if (partnerMon) {
         const c = isTracked('char') ? getPartnerData() : null;
         if(c?.isPregnant && (care(c).maternalDeath || ['loss','frozen'].includes(care(c).event))){
-            partnerMon.style.display='block';partnerMon.innerHTML=esc(care(c).result || cycleSummary('char',c,s));
+            partnerMon.style.display='block';setMonitorHtml(partnerMon, esc(care(c).result || cycleSummary('char',c,s)));
         } else if (c && c.isPregnant) {
             partnerMon.style.display = 'block';
             const dur = s.pregnancyDuration || 40;
@@ -1225,7 +1238,7 @@ export function syncUI() {
                 const dd = calculateDueDate(c.conceptionDate);
                 if (dd) dueStr = dd.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
             }
-            partnerMon.innerHTML = `
+            const partnerMonitorChanged = setMonitorHtml(partnerMon, `
                 <div class="rp-m-head pink">${carrierName('char')} — ${weeks}/${dur} нед.</div>
                 <div class="rp-m-progress"><div class="rp-m-progress-fill pink" style="width:${pct}%"></div></div>
                 <div class="rp-m-grid">
@@ -1236,8 +1249,8 @@ export function syncUI() {
                 <div class="rp-m-action-row">
                     <button id="repro-partner-birth" class="rp-m-btn">Принять роды</button>
                     <button id="repro-partner-reset" class="rp-m-btn">Сброс</button>
-                </div>`;
-            setTimeout(() => {
+                </div>`);
+            if (partnerMonitorChanged) setTimeout(() => {
                 const bb = el('repro-partner-birth');
                 if (bb) bb.onclick = () => {
                     if (!confirm(`Принять роды у ${carrierName('char')}? Запустится диалог именования.`)) return;
@@ -1297,7 +1310,7 @@ export function syncUI() {
                     ${baby.fatherName ? `<div class="rp-m-cell"><span class="rp-m-lbl">Второй родитель</span><span class="rp-m-val">${escapeLabel(baby.fatherName)}</span></div>` : ''}
                 </div>`;
             });
-            babyMon.innerHTML = monHtml;
+            setMonitorHtml(babyMon, monHtml);
         } else {
             babyMon.style.display = 'none';
             if (resetBabyBtn) resetBabyBtn.style.display = 'none';
@@ -1420,6 +1433,24 @@ export function setupUI() {
                             </div>
                         </div>
 
+                        <details class="rp-narrator-settings rp-advanced-options">
+                            <summary><i class="fa-solid fa-users" aria-hidden="true"></i> Несколько персонажей в одной карточке</summary>
+                            <div class="rp-narrator-body">
+                                <label class="checkbox_label rp-switch"><input type="checkbox" id="rp-narrator-enabled"><span>Режим нарратора</span></label>
+                                <p class="rp-mini-note">Имена и роли сохраняются для этого чата. Каждый участник может вынашивать, оплодотворять, делать и то и другое или не участвовать.</p>
+                                <div class="rp-narrator-line">
+                                    <input id="rp-narrator-name" class="text_pole" maxlength="80" placeholder="Имя персонажа" aria-label="Имя участника">
+                                    <select id="rp-narrator-role" class="text_pole" aria-label="Роль участника">
+                                        <option value="fertilize">Оплодотворяет</option>
+                                        <option value="carry">Вынашивает</option>
+                                        <option value="both">Обе роли</option>
+                                        <option value="none">Не участвует</option>
+                                    </select>
+                                    <button id="rp-narrator-add" type="button" class="menu_button">＋ Добавить</button>
+                                </div>
+                                <div id="rp-narrator-roster" class="rp-compact-roster" aria-live="polite"></div>
+                            </div>
+                        </details>
                         <div class="rp-mini-options">
                             <label class="checkbox_label rp-switch rp-switch-soft" title="Скрывать неподтверждённую беременность; учитывать тесты, раскрытие и факты текущей сцены"><input type="checkbox" id="repro-hidden-preg"><span>Скрывать беременность до подтверждения</span></label>
                             <label class="checkbox_label rp-switch rp-switch-soft" title="Учитывать сюжетные события, влияющие на длительность цикла, и показывать в интерфейсе необязательные подсказки по фазам. Настроение и ощущения модели не предписываются."><input type="checkbox" id="repro-realism"><span>Учитывать цикл в сюжете</span></label>
@@ -1532,6 +1563,38 @@ export function setupUI() {
                         </div>
                     </div>
 
+                    <details class="rp-narrator-dna rp-advanced-options">
+                        <summary><i class="fa-solid fa-dna" aria-hidden="true"></i> ДНК-тест и второй родитель</summary>
+                        <div class="rp-narrator-body">
+                            <p class="rp-mini-note">Для карточки с несколькими героями: укажи возможных родителей и число сюжетных контактов. Результат игрового броска сохраняется и не меняется при повторном тесте.</p>
+                            <div class="rp-form-card rp-form-inline">
+                                <label for="rp-dna-target">Чья беременность / ребёнок</label>
+                                <select id="rp-dna-target" class="text_pole"><option value="user">Моя персона</option><option value="char">Активный персонаж</option></select>
+                            </div>
+                            <div class="rp-narrator-line">
+                                <input id="rp-dna-parent-name" class="text_pole" maxlength="80" placeholder="Возможный второй родитель" aria-label="Имя возможного родителя">
+                                <input id="rp-dna-contact-count" class="text_pole" type="number" min="1" max="20" value="1" aria-label="Количество контактов">
+                                <button id="rp-dna-add-contact" class="menu_button" type="button">＋ Контакт</button>
+                            </div>
+                            <div id="rp-dna-candidates" class="rp-compact-roster" aria-live="polite"></div>
+                            <div class="rp-form-card rp-form-inline">
+                                <label for="rp-dna-fixed-parent">Второй родитель известен точно</label>
+                                <input id="rp-dna-fixed-parent" class="text_pole" maxlength="80" placeholder="Имя (необязательно)">
+                            </div>
+                            <button id="rp-dna-save-parent" class="menu_button" type="button">Сохранить известного родителя</button>
+                            <div class="rp-form-card rp-form-inline">
+                                <label for="rp-dna-gestation">Тип вынашивания</label>
+                                <select id="rp-dna-gestation" class="text_pole"><option value="uterine">Внутриматочная беременность</option><option value="egg">Яйцо</option><option value="other">Другой способ</option></select>
+                            </div>
+                            <div class="rp-form-card rp-form-inline">
+                                <label for="rp-dna-method">Как проводят тест</label>
+                                <select id="rp-dna-method" class="text_pole"><option value="noninvasive">Неинвазивно (без риска процедуры)</option><option value="invasive">Инвазивно (игровой риск)</option></select>
+                            </div>
+                            <p class="rp-mini-note" id="rp-dna-risk-hint">Шансы вымышленные и нужны только для истории; это не медицинские вероятности.</p>
+                            <button id="rp-dna-run" class="menu_button rp-button-primary" type="button">Провести сюжетный ДНК-тест</button>
+                            <div id="rp-dna-result" class="rp-dna-result" role="status" aria-live="polite"></div>
+                        </div>
+                    </details>
                     <details class="rp-advanced-options">
                         <summary><i class="fa-solid fa-gear" aria-hidden="true"></i> Дополнительные настройки</summary>
                         <div class="rp-utility-actions">
@@ -1577,16 +1640,38 @@ details.repro { ... }"></textarea>
 </div>`;
         $('#extensions_settings2').append(html);
         installInterfaceHelp();
-        // Presentation-only tabs. Existing control IDs, values and event handlers are unchanged.
+        // Render one panel at a time. Native DOM removal preserves listeners/field values;
+        // unlike jQuery.remove(), it does not destroy handlers or user input.
         const $dashboard = $('#extensions_settings2 .reproductive-system-settings').last();
-        $dashboard.find('.rp-tab').on('click', function () {
-            const view = this.dataset.rpView;
-            $dashboard.attr('data-rp-tab', view);
+        const panelRoot = $dashboard[0];
+        const tabNodes = {
+            settings: panelRoot.querySelector('.rp-card-controls'),
+            state: panelRoot.querySelector('.rp-card-status'),
+            tools: panelRoot.querySelector('.rp-card-actions'),
+        };
+        const tabPlaces = new Map();
+        for (const node of Object.values(tabNodes)) {
+            const anchor = document.createComment('Reproductive panel placeholder');
+            node.parentNode.insertBefore(anchor, node);
+            tabPlaces.set(node, anchor);
+        }
+        const activateTab = (view) => {
+            if (!tabNodes[view]) return;
+            panelRoot.dataset.rpTab = view;
+            for (const [name, node] of Object.entries(tabNodes)) {
+                if (name === view) tabPlaces.get(node).after(node);
+                else node.remove();
+            }
             $dashboard.find('.rp-tab').each(function () {
                 const active = this.dataset.rpView === view;
                 this.classList.toggle('is-active', active);
                 this.setAttribute('aria-pressed', String(active));
             });
+            // This reads the real state only after the tab has become visible.
+            syncUI();
+        };
+        $dashboard.find('.rp-tab').on('click', function () {
+            activateTab(this.dataset.rpView);
         });
         $('#rp-open-profiles').on('click',()=>openReproductiveSettings());
 
@@ -1610,6 +1695,137 @@ details.repro { ... }"></textarea>
             wandItem.on('click', () => { menu.hide(); showQuickBar(); });
         };
         registerWandItem();
+
+        // Per-chat narrator/paternity workflow; all records persist in the existing chat ledger.
+        const getDnaTarget = () => {
+            const root = getPregnancyData();
+            const selected = $('#rp-dna-target').val() || 'user';
+            if (selected.startsWith('baby:')) {
+                const index = Number(selected.slice(5));
+                return { target: root.babies?.[index], born: true, who: selected };
+            }
+            return { target: selected === 'char' ? getPartnerData() : root, born: false, who: selected };
+        };
+        const renderNarratorRoster = () => {
+            const root = getPregnancyData();
+            const box = document.getElementById('rp-narrator-roster');
+            if (!box) return;
+            const names = {carry:'Вынашивает',fertilize:'Оплодотворяет',both:'Обе роли',none:'Без участия'};
+            box.replaceChildren();
+            for (const [i, participant] of (root.narratorParticipants || []).entries()) {
+                const row = document.createElement('div');
+                row.className = 'rp-mini-roster-row';
+                const label = document.createElement('span');
+                label.textContent = `${participant.name} · ${names[participant.role] || names.none}`;
+                const button = document.createElement('button');
+                button.type = 'button'; button.className = 'menu_button';
+                button.setAttribute('aria-label', `Удалить ${participant.name}`);
+                button.dataset.removeParticipant = String(i); button.textContent = '×';
+                row.append(label,button);box.append(row);
+            }
+        };
+        const updateDnaPanel = () => {
+            const box = document.getElementById('rp-dna-candidates');
+            if (!box) return;
+            const root = getPregnancyData();
+            const select = document.getElementById('rp-dna-target');
+            if (select) {
+                const last = select.value;
+                const babies = root.babies || [];
+                const needed = ['user','char',...babies.map((_,i)=>`baby:${i}`)];
+                if ([...select.options].map(o=>o.value).join('|') !== needed.join('|')) {
+                    select.replaceChildren(...needed.map(value=>{
+                        const opt = document.createElement('option');opt.value=value;
+                        opt.textContent = value==='user'?'Моя персона':value==='char'?'Активный персонаж':`Ребёнок: ${babies[Number(value.slice(5))]?.name || Number(value.slice(5))+1}`;
+                        return opt;
+                    }));
+                    if (needed.includes(last)) select.value=last;
+                }
+            }
+            const {target,born} = getDnaTarget();
+            box.replaceChildren();
+            if (!target) return;
+            const gest = document.getElementById('rp-dna-gestation');
+            if (gest) gest.value = target.gestationType || 'uterine';
+            const fixed = document.getElementById('rp-dna-fixed-parent');
+            if (fixed && document.activeElement!==fixed) fixed.value = target._secondParentManual ? (target.fatherName||'') : '';
+            for (const [i, item] of (target.paternityCandidates || []).entries()) {
+                const row = document.createElement('div');row.className='rp-mini-roster-row';
+                const label = document.createElement('span');label.textContent=`${item.name} · контактов: ${item.count}`;
+                const button=document.createElement('button');button.type='button';button.className='menu_button';button.dataset.removeDna=String(i);button.textContent='×';
+                button.setAttribute('aria-label',`Убрать ${item.name} из списка`);row.append(label,button);box.append(row);
+            }
+            const res = document.getElementById('rp-dna-result');
+            if (res) res.textContent = target.dnaResult?.parent
+                ? `Подтверждено: ${target.dnaResult.parent}${target.dnaResult.procedureAlert?' · после процедуры требуется наблюдение по сюжету':''}`
+                : 'Результата ДНК-теста ещё нет.';
+            const method = document.getElementById('rp-dna-method')?.value || 'noninvasive';
+            const proc = dnaProcedure(method,gest?.value || 'uterine',target.pregnancyWeeks || 0,born);
+            const hint = document.getElementById('rp-dna-risk-hint');
+            if (hint) hint.textContent = `${proc.label}. Вероятности только игровые, не медицинские.`;
+        };
+        $('#rp-narrator-enabled').on('change', function() {
+            getPregnancyData().narratorMode = this.checked;
+            saveSettingsDebounced();renderNarratorRoster();
+        });
+        $('#rp-narrator-add').on('click', () => {
+            const root=getPregnancyData(), input=document.getElementById('rp-narrator-name');
+            const role=$('#rp-narrator-role').val();
+            root.narratorParticipants=addParticipant(root.narratorParticipants,input?.value,role);
+            if(input)input.value='';saveSettingsDebounced();renderNarratorRoster();
+        });
+        $('#rp-narrator-roster').on('click','button[data-remove-participant]',function() {
+            const root=getPregnancyData(),index=Number(this.dataset.removeParticipant);
+            if(index>=0 && index < (root.narratorParticipants||[]).length)root.narratorParticipants.splice(index,1);
+            saveSettingsDebounced();renderNarratorRoster();
+        });
+        $('#rp-dna-target,#rp-dna-method').on('change',updateDnaPanel);
+        $('#rp-dna-gestation').on('change',function() {
+            const {target}=getDnaTarget();if(!target)return;
+            target.gestationType=this.value;saveSettingsDebounced();updateDnaPanel();
+        });
+        $('#rp-dna-add-contact').on('click', () => {
+            const {target}=getDnaTarget();if(!target)return;
+            const name=$('#rp-dna-parent-name').val(),count=Number($('#rp-dna-contact-count').val())||1;
+            target.paternityCandidates=addContact(target.paternityCandidates,name,count);
+            $('#rp-dna-parent-name').val('');saveSettingsDebounced();updateDnaPanel();
+        });
+        $('#rp-dna-candidates').on('click','button[data-remove-dna]',function() {
+            const {target}=getDnaTarget();if(!target)return;
+            const index=Number(this.dataset.removeDna);
+            if(index>=0 && index < (target.paternityCandidates||[]).length) target.paternityCandidates.splice(index,1);
+            saveSettingsDebounced();updateDnaPanel();
+        });
+        $('#rp-dna-save-parent').on('click', () => {
+            const {target,born,who}=getDnaTarget();if(!target)return;
+            const name=normalizeParticipant($('#rp-dna-fixed-parent').val());
+            if(!name){showNotification('Укажи имя известного родителя','warning');return;}
+            if (target.dnaResult?.parent && target.dnaResult.parent !== name) {
+                if (!confirm('ДНК-тест уже определил другого родителя. Перезаписать сюжетный факт вручную? Предыдущий результат теста будет сброшен.')) return;
+                target.dnaResult = null;
+            }
+            if(born){target.fatherName=name;target._secondParentManual=true;}
+            else setSecondParent(who,name);
+            saveSettingsDebounced();updateDnaPanel();
+        });
+        $('#rp-dna-run').on('click', () => {
+            const {target,born}=getDnaTarget();
+            if (!target || (!born && !target.isPregnant)) {showNotification('Нет активной беременности или выбранного ребёнка','warning');return;}
+            const result=performNarrativeDNA(target,{
+                method:$('#rp-dna-method').val(),gestation:$('#rp-dna-gestation').val(),
+                weeks:target.pregnancyWeeks||0,born,
+            });
+            if (!result.ok) {showNotification(result.reason,'warning');return;}
+            if (!result.existing) {
+                if (result.result.procedureAlert) {
+                    target.dnaProcedureWarning = 'После инвазивного ДНК-теста требуется наблюдение по сюжету.';
+                }
+                refreshRegenSnapshot();saveSettingsDebounced();updatePromptInjection();syncUI();
+                import('./message-handler.js').then(m=>m.scheduleInfoblockRender(120));
+            }
+            updateDnaPanel();
+            showNotification(result.existing ? 'Результат ДНК уже сохранён' : 'Результат ДНК-теста сохранён','success');
+        });
 
         // Events
         $('#repro-enabled').on('change', function() {
@@ -1920,7 +2136,20 @@ details.repro { ... }"></textarea>
         s.theme = normalizeTheme(s.theme);
         applyTheme(s.theme);
 
-        syncUI();
+        activateTab('state');
+        $dashboard.find('.rp-tab').on('click.reproNarrator', function() {
+            if (this.dataset.rpView === 'settings') {
+                const checkbox = document.getElementById('rp-narrator-enabled');
+                if (checkbox) checkbox.checked = !!getPregnancyData().narratorMode;
+                renderNarratorRoster();
+            }
+            if (this.dataset.rpView === 'tools') updateDnaPanel();
+        });
+        // When the enclosing SillyTavern drawer was closed, we intentionally skipped
+        // expensive status DOM work; refresh only on its next opening.
+        $dashboard.closest('.inline-drawer').children('.inline-drawer-toggle').on('click.reproLazy', () => {
+            setTimeout(() => { if (panelRoot.isConnected) syncUI(); }, 0);
+        });
     } catch (error) {
         reportError('[Reproductive] setupUI error:', error);
     }

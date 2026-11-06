@@ -274,7 +274,7 @@ function runScan() {
             }
             syncUI();
             updatePromptInjection();
-            setTimeout(renderInfoblock, 500);
+            scheduleInfoblockRender(500);
             // If no conception/birth to process — still continue to Extra API for dynamic data
         }
 
@@ -315,7 +315,7 @@ function runScan() {
                 saveSettingsDebounced();
                 syncUI();
                 updatePromptInjection();
-                setTimeout(renderInfoblock, 500);
+                scheduleInfoblockRender(500);
                 pushStateHistory(positionId);
             }
         }
@@ -335,7 +335,7 @@ function runScan() {
             }
             syncUI();
             updatePromptInjection();
-            setTimeout(renderInfoblock, 500);
+            scheduleInfoblockRender(500);
             pushStateHistory(positionId);
             saveSettingsDebounced();
             return;
@@ -433,7 +433,7 @@ function runScan() {
     saveSettingsDebounced();
     syncUI();
     updatePromptInjection();
-    setTimeout(renderInfoblock, 500);
+    scheduleInfoblockRender(500);
 }
 
 // ─── Force re-scan with full message text (called from CHARACTER_MESSAGE_RENDERED).
@@ -464,7 +464,7 @@ export function rescanStatusOnly(fullText) {
     applyStatusData(s, getPregnancyData(), statusData);
     saveSettingsDebounced();
     syncUI();
-    setTimeout(renderInfoblock, 300);
+    scheduleInfoblockRender(300);
     return true;
 }
 
@@ -826,7 +826,7 @@ function maybeGraduateBabies(s, p) {
                 nMod.showGraduationDialog(graduates, () => {
                     mod.graduateBabies(graduates);
                     _graduationDialogShowing = false;
-                    setTimeout(renderInfoblock, 300);
+                    scheduleInfoblockRender(300);
                 });
             }).catch(e => {
                 // Тихий fallback: всё равно выпускаем
@@ -841,6 +841,17 @@ function maybeGraduateBabies(s, p) {
 // ─── Reveal planned complications when their week arrives ───
 
 function revealPlannedComplications() { /* Legacy saves are examined through care-runtime. */ }
+
+// Batch infoblock requests. The latest state always wins and unnecessary
+// intermediate DOM renders (streaming, edits and event bursts) are discarded.
+let _infoblockTimer = null;
+export function scheduleInfoblockRender(delay = 180) {
+    if (_infoblockTimer !== null) clearTimeout(_infoblockTimer);
+    _infoblockTimer = setTimeout(() => {
+        _infoblockTimer = null;
+        renderInfoblock();
+    }, Math.max(0, delay));
+}
 
 // ─── Infoblock rendering ───
 
@@ -1090,7 +1101,7 @@ export function processDateTag(text) {
             saveSettingsDebounced();
             syncUI();
             updatePromptInjection();
-            setTimeout(renderInfoblock, 500);
+            scheduleInfoblockRender(500);
             return true;
         } else if (diffDays < 0) {
         }
@@ -1111,6 +1122,7 @@ export function setManualPregnancyWeeks(who, value) {
         ? new Date(anchor.getTime() - weeks * 7 * 86400000).toISOString() : null;
     c._conceptionAnchored = !!c.conceptionDate;
     c._userSetWeeksAt = Date.now();
+    c._manualTermSet = true;
     refreshRegenSnapshot();
     saveSettingsDebounced();
     updatePromptInjection();
@@ -1145,7 +1157,11 @@ export function setSecondParent(who, name) {
     if (!['user','char'].includes(who)) return false;
     const carrier = who === 'char' ? getPartnerData() : getPregnancyData();
     if (!carrier.isPregnant) return false;
-    carrier.fatherName = String(name || '').trim().slice(0,80);
+    const newName = String(name || '').trim().slice(0,80);
+    if (carrier.dnaResult?.parent && carrier.dnaResult.parent !== newName) {
+        carrier.dnaResult = null; // Manual override invalidates the previous test, never contradict it.
+    }
+    carrier.fatherName = newName;
     carrier._secondParentManual = true;
     refreshRegenSnapshot();
     saveSettingsDebounced();

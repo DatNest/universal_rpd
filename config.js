@@ -133,6 +133,12 @@ export const defaultPregnancyData = {
 
     // ── Данные ПАРТНЁРА ({{char}}) — заполняются при trackFor 'char'/'both' ──
     // Дети (babies/grownChildren) ОБЩИЕ и живут в корне p — семья одна.
+    narratorMode: false, // per-chat: one card can control several named participants
+    narratorParticipants: [], // {name, role}; participants do not share the active character's cycle
+    paternityCandidates: [], // {name, count} = established RP contact opportunities
+    dnaResult: null,
+    gestationType: 'uterine',
+    _manualTermSet: false,
     partner: null, // { ...defaultPartnerData } создаётся лениво
 };
 
@@ -144,6 +150,10 @@ export const defaultPartnerData = {
     conceptionDate: null,
     pregnancyWeeks: 0,
     _manualPregnancy: false, // данная беременность начата через ручную настройку
+    _manualTermSet: false,
+    paternityCandidates: [],
+    dnaResult: null,
+    gestationType: 'uterine',
     fetusCount: 1,
     fetusSex: [],
     fetusSexRevealed: false,

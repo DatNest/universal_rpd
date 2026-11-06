@@ -42,6 +42,12 @@ export function getBasePrompt() {
     if(!active.length && !p.hasBaby)return '';
     let b=`[REPRODUCTIVE] user={{user}}; char={{char}}. Tracking: ${active.join(', ')||'none'}. Can carry: ${active.filter(w=>canCarry(s,w)).join(', ')||'none'}.\n`;
     b+='RP_STATUS root concerns user; partner concerns char. Tracker state is private until observed, disclosed, examined or detectable by established abilities. Do not decide the player’s actions or feelings.\n';
+    if (p.narratorMode) {
+        const parts = (p.narratorParticipants || []).slice(0,20).map(x =>
+            ({name:String(x.name||'').slice(0,80),role:x.role})).filter(x=>x.name && ['carry','fertilize','both','none'].includes(x.role));
+        b+=`Narrator card: multiple named NPCs may share {{char}}. Registered roles=${JSON.stringify(parts)}. Do not assume all NPCs share physiology or parentage; attribute events only to explicitly named participants. DNA parentage is unknown until confirmed by a narrated test or a recorded manual fact.\n`;
+    }
+
     if(p.rpDate)b+=`RP time: ${new Date(p.rpDate).toLocaleString('en-GB',{hour12:false})}. Advance only with elapsed story time.\n`;
     b+=active.map(w=>carrierCycleLine(w,s,p)).join('');
     b+=runtimePrompt(s,p);

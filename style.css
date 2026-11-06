@@ -28,7 +28,7 @@
 }
 /* Reusable contextual help for every interactive control. Rendered in the browser top layer. */
 #rp-interface-tooltip {
-  position: fixed !important; inset: auto !important; margin: 0 !important;
+  position: fixed !important; top: 0; left: 0; right: auto; bottom: auto; margin: 0 !important;
   max-width: min(360px, calc(100vw - 20px)); width: max-content;
   padding: 10px 12px; border: 1px solid var(--rp-stroke) !important;
   border-radius: 7px; background: var(--rp-surface-alt) !important;
@@ -41,6 +41,15 @@
 #rp-interface-tooltip:not(:popover-open) { display: none; }
 #rp-interface-tooltip:popover-open { display: block; }
 
+/* Compact narrator and DNA controls follow existing slim row pattern. */
+.reproductive-system-settings .rp-narrator-body { display:grid; gap:7px; padding:8px 10px; }
+.reproductive-system-settings .rp-narrator-line { display:grid; grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) auto; gap:6px; align-items:center; }
+.reproductive-system-settings .rp-narrator-line #rp-dna-contact-count { width:100%; }
+.reproductive-system-settings .rp-mini-roster-row { display:flex; align-items:center; gap:8px; padding:4px 0; border-bottom:1px solid var(--rp-stroke-soft); }
+.reproductive-system-settings .rp-mini-roster-row > span { flex:1; overflow-wrap:anywhere; }
+.reproductive-system-settings .rp-mini-roster-row > button { min-width:34px!important; width:34px!important; padding:2px!important; }
+.reproductive-system-settings .rp-dna-result { padding:8px 10px; border:1px solid var(--rp-stroke-soft); border-radius:5px; }
+@container (max-width:420px) { .reproductive-system-settings .rp-narrator-line { grid-template-columns:1fr; } }
 /* The historical light-mode setting does not substitute a hard-coded palette. */
 body[data-rp-light] { --rp-surface-alt: color-mix(in srgb, var(--SmartThemeBlurTintColor) 92%, var(--SmartThemeBodyColor) 8%); }
 
@@ -734,4 +743,12 @@ details.repro.repro-multi details.repro { margin: 0; max-width: none; }
 @media (prefers-reduced-motion: reduce) {
   :is(.reproductive-system-settings,.rp-profile-dialog,details.repro,.rb-dialog,.rp-tree-dialog,.rp-quick-dialog,.rp-th-dialog,.rg-card,.custom-notification) *,
   .rg-confetti { animation: none !important; transition: none !important; }
+}
+
+/* Off-screen portions of expanded long lists do not trigger layout/paint. */
+.rp-profile-dialog [data-rp-catalog-list],
+.rp-profile-dialog .rp-custom-list,
+.rp-tree-dialog .rp-tree-body {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 240px;
 }

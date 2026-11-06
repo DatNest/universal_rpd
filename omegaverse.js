@@ -7,7 +7,19 @@ export function carrierMode(s) {
     if (['user', 'char', 'both', 'none'].includes(s?.carrierMode)) return s.carrierMode;
     return ['user', 'char', 'both', 'none'].includes(s?.trackFor) ? s.trackFor : 'user';
 }
-export function canCarry(s, who) { const m = carrierMode(s); return (who === 'user' || who === 'char') && (m === 'both' || m === who); }
+export function canCarry(s, who) {
+    if (who !== 'user' && who !== 'char') return false;
+    const role = profile(s,who).reproductiveRole;
+    if (role !== 'auto') return role === 'carry' || role === 'both';
+    const m=carrierMode(s);
+    return m==='both' || m===who;
+}
+export function canFertilize(s, who) {
+    if (who !== 'user' && who !== 'char') return false;
+    const role=profile(s,who).reproductiveRole;
+    // 'auto' means old saves keep their previous conception behaviour.
+    return role==='auto' || role==='fertilize' || role==='both';
+}
 export function hasMenstrualCycle(s, who) { return canCarry(s, who) && profile(s,who).cycleType === 'menstrual'; }
 export function hasAnyTracking(s, who) { const mode = s?.trackFor || 'user'; return mode === 'both' || mode === who; }
 // Legacy callers cannot reintroduce role-based fertility or independent clocks.
